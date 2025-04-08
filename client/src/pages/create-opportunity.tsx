@@ -271,12 +271,8 @@ export default function CreateOpportunity() {
                           <div className="space-y-2">
                             <Textarea 
                               placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints." 
-                              onChange={field.onChange} 
-                              onBlur={field.onBlur} 
-                              name={field.name} 
-                              ref={field.ref} 
-                              value={field.value ?? ''} 
                               maxLength={280}
+                              {...field}
                             />
                             <div className="text-xs text-muted-foreground text-right">
                               {(field.value?.length ?? 0)}/280
@@ -299,7 +295,7 @@ export default function CreateOpportunity() {
                             <Textarea
                               placeholder="- Understand how product teams operate in a large org
 - Learn about agile delivery practices and ceremonies
-- Cross team collaboration"
+                              - Cross team collaboration"
                               rows={6}
                               className="min-h-[150px]"
                               maxLength={280}
