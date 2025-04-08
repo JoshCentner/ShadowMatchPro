@@ -268,15 +268,20 @@ export default function CreateOpportunity() {
                       <FormItem>
                         <FormLabel>Host Details</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints." 
-                            onChange={field.onChange} 
-                            onBlur={field.onBlur} 
-                            name={field.name} 
-                            ref={field.ref} 
-                            value={field.value ?? ''} 
-                            maxLength={280}
-                          />
+                          <div className="space-y-2">
+                            <Textarea 
+                              placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints." 
+                              onChange={field.onChange} 
+                              onBlur={field.onBlur} 
+                              name={field.name} 
+                              ref={field.ref} 
+                              value={field.value ?? ''} 
+                              maxLength={280}
+                            />
+                            <div className="text-xs text-muted-foreground text-right">
+                              {(field.value?.length ?? 0)}/280
+                            </div>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
