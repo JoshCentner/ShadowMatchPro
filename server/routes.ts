@@ -141,9 +141,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile
   apiRouter.put("/users/:id", async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id);
+    console.log('API /users/:id PUT - Request body:', req.body);
+    console.log('API /users/:id PUT - User ID:', userId);
     
     try {
       const userData = insertUserSchema.partial().parse(req.body);
+      console.log('API /users/:id PUT - Validated data:', userData);
       const updatedUser = await storage.updateUser(userId, userData);
       
       if (!updatedUser) {

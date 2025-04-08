@@ -40,13 +40,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         // First check for stored userId in localStorage
         const storedUserId = localStorage.getItem('shadowUserId');
-        
+
         if (storedUserId) {
           try {
             const response = await fetch(`/api/auth/me?userId=${storedUserId}`, {
               credentials: 'include',
             });
-            
+
             if (response.ok) {
               const userData = await response.json();
               setUser(userData);
@@ -63,31 +63,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             // Continue to check Supabase session
           }
         }
-        
+
         // Check for active Supabase session
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        
+
         if (sessionError) {
           console.error('Error checking Supabase session:', sessionError);
           setIsLoading(false);
           return;
         }
-        
+
         if (sessionData.session) {
           const { data: userData, error: userError } = await supabase.auth.getUser();
-          
+
           if (userError || !userData.user) {
             console.error('Error getting Supabase user:', userError);
             setIsLoading(false);
             return;
           }
-          
+
           // We have a Supabase user, fetch or create the user in our system
           const email = userData.user.email;
           const name = userData.user.user_metadata?.name || 
                       userData.user.user_metadata?.full_name || 
                       (email ? email.split('@')[0] : 'User');
-          
+
           if (email) {
             try {
               // Check if we already have this user in our system
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 name,
                 pictureUrl: userData.user.user_metadata?.avatar_url
               });
-              
+
               if (existingUserResponse.ok) {
                 const ourUser = await existingUserResponse.json();
                 setUser(ourUser);
@@ -113,29 +113,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setIsLoading(false);
       }
     };
-    
+
     checkUser();
   }, []);
 
   const login = async (email: string, name: string, organisationId: number) => {
     try {
       setIsLoading(true);
-      
+
       // Check if we're coming from Google auth
       const session = await supabase.auth.getSession();
       const isGoogleAuth = !!session.data.session;
-      
+
       // Use the appropriate endpoint based on auth type
       const endpoint = isGoogleAuth ? '/api/auth/google-signin' : '/api/auth/register';
-      
+
       // For Google auth, we might have a picture
       let pictureUrl: string | undefined;
-      
+
       if (isGoogleAuth) {
         const userData = await supabase.auth.getUser();
         pictureUrl = userData.data.user?.user_metadata?.avatar_url;
       }
-      
+
       const payload = {
         email,
         name,
@@ -143,18 +143,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         isAuthenticated: true,
         ...(pictureUrl && { pictureUrl })
       };
-      
+
       const response = await apiRequest('POST', endpoint, payload);
-      
+
       const userData = await response.json();
       setUser(userData);
       localStorage.setItem('shadowUserId', userData.id.toString());
-      
+
       toast({
         title: "Successfully signed in",
         description: `Welcome, ${userData.name}!`,
       });
-      
+
       // If user has no org selected, redirect to profile
       if (!userData.organisationId) {
         navigate('/profile');
@@ -177,24 +177,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       // Sign out from Supabase
       await supabase.auth.signOut();
-      
+
       // Clear local state
       setUser(null);
       localStorage.removeItem('shadowUserId');
       navigate('/auth');
-      
+
       toast({
         title: "Signed out",
         description: "You have been successfully signed out.",
       });
     } catch (error) {
       console.error('Logout error:', error);
-      
+
       // Even if Supabase logout fails, clear local state
       setUser(null);
       localStorage.removeItem('shadowUserId');
       navigate('/auth');
-      
+
       toast({
         title: "Signed out",
         description: "You have been signed out, but there was an issue with the authentication provider.",
@@ -202,14 +202,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const updateProfile = async (userData: Partial<User>) => {
-    if (!user) return;
-    
+  const updateProfile = async (data: Partial<User>) => {
+    console.log('Auth updateProfile - Request data:', data);
     try {
-      const response = await apiRequest('PUT', `/api/users/${user.id}`, userData);
-      const updatedUser = await response.json();
-      setUser(updatedUser);
-      
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      console.log('Auth updateProfile - Response:', result);
+      if (!response.ok) {
+        throw new Error(`Failed to update profile: ${result.message}`);
+      }
+      setUser(result);
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
@@ -223,11 +232,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
     }
   };
-  
+
   const loginWithGoogle = async () => {
     try {
       setIsLoading(true);
-      
+
       // Redirect to Google OAuth
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -238,14 +247,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         },
       });
-      
+
       if (error) {
         throw error;
       }
-      
+
       // Nothing more to do here as user will be redirected to Google
       // The callback will handle the rest of the authentication flow
-      
+
     } catch (error) {
       console.error('Google login error:', error);
       toast({

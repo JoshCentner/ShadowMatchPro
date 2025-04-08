@@ -70,7 +70,15 @@ export default function Profile() {
   const onSubmit = async (data: z.infer<typeof profileSchema>) => {
     if (!user) return;
     
-    await updateProfile(data as Partial<User>);
+    console.log('Profile form submission - Form values:', data);
+    console.log('Profile form submission - Current user:', user);
+    
+    try {
+      const result = await updateProfile(data as Partial<User>);
+      console.log('Profile update response:', result);
+    } catch (error) {
+      console.error('Profile update error:', error);
+    }
   };
 
   const getInitials = (name: string) => {
