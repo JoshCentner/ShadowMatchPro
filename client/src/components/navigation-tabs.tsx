@@ -16,9 +16,9 @@ export default function NavigationTabs() {
   const [location] = useLocation();
 
   return (
-    <div className="border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+    <div className="border-b border-gray-200 w-full overflow-x-auto">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max" aria-label="Tabs">
           {tabs.map((tab) => {
             const isActive = 
               tab.href === '/' ? location === '/' : location.startsWith(tab.href);
