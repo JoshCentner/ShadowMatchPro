@@ -2,7 +2,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testSupabaseConnection } from "./supabase";
-import { migrateDatabase, seedDatabase } from "./migration";
 
 const app = express();
 app.use(express.json());
@@ -39,12 +38,11 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize Supabase for storage
+  // Initialize Supabase for storage and database
   await testSupabaseConnection();
   
-  // We're using Drizzle for database operations now instead of Supabase
-  // await migrateDatabase();
-  // await seedDatabase();
+  // Using Supabase for database operations - tables should already exist
+  log('Using Supabase for database operations', 'express');
   
   const server = await registerRoutes(app);
 

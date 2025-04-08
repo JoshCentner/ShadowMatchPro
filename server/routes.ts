@@ -1,6 +1,6 @@
 import { Router, type Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./supabase-storage";
 import { z } from "zod";
 import { 
   insertUserSchema, 
