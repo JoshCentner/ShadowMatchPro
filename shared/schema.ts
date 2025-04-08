@@ -21,10 +21,10 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   organisationId: integer("organisation_id").references(() => organisations.id),
-  currentRole: text("current_role"),
-  lookingFor: text("looking_for"),
-  isAuthenticated: boolean("is_authenticated").default(true),
-  pictureUrl: text("picture_url").notNull(),
+  current_role: text("current_role"),
+  looking_for: text("looking_for"),
+  is_authenticated: boolean("is_authenticated").default(true),
+  picture_url: text("picture_url"),
 });
 
 // Opportunities table
