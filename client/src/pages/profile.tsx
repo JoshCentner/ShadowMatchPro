@@ -58,9 +58,9 @@ export default function Profile() {
     if (user) {
       const formData = {
         name: user.name,
-        organisationId: user.organisationId || 0,
-        currentRole: user.currentRole || '',
-        lookingFor: user.lookingFor || '',
+        organisationId: user.organisation_id || 0,
+        currentRole: user.role_title || '',
+        lookingFor: user.looking_for || '',
       };
       console.log('Profile - Setting form data:', formData);
       form.reset(formData);
