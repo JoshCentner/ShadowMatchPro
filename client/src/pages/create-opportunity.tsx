@@ -118,7 +118,14 @@ export default function CreateOpportunity() {
     try {
       if (isEditing && opportunityId) {
         // Update existing opportunity
-        await apiRequest("PUT", `/api/opportunities/${opportunityId}`, data);
+        const updatedOpportunity = await apiRequest("PUT", `/api/opportunities/${opportunityId}`, {
+          ...data,
+          createdByUserId: user.id
+        });
+
+        if (!updatedOpportunity) {
+          throw new Error("Failed to update opportunity");
+        }
 
         toast({
           title: "Opportunity updated",
