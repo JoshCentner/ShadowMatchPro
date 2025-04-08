@@ -20,6 +20,12 @@ export default function Auth() {
     try {
       setIsManualLoading(true);
       
+      // Check for bypass auth mode
+      if (import.meta.env.VITE_BYPASS_AUTH === 'true') {
+        await login('test@example.com', 'Test User', 1);
+        return;
+      }
+      
       // For the demo, we use example email with the organization name
       let orgName = "";
       switch (organisationId) {
@@ -66,6 +72,13 @@ export default function Auth() {
 
   const handleGoogleLogin = () => {
     if (isLoading || isManualLoading) return;
+    
+    // Check for bypass auth mode
+    if (import.meta.env.VITE_BYPASS_AUTH === 'true') {
+      login('test@example.com', 'Test User', 1);
+      return;
+    }
+    
     loginWithGoogle();
   };
 
