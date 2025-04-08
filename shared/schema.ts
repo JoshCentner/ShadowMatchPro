@@ -24,7 +24,7 @@ export const users = pgTable("users", {
   currentRole: text("current_role"),
   lookingFor: text("looking_for"),
   isAuthenticated: boolean("is_authenticated").default(true),
-  pictureUrl: text("picture_url"),
+  pictureUrl: text("picture_url").notNull(),
 });
 
 // Opportunities table
