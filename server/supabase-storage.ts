@@ -99,7 +99,7 @@ export class SupabaseStorage implements IStorage {
     
     // Transform data to match database field names
     const dbData: Record<string, any> = {};
-    if (userData.currentRole !== undefined) dbData.current_role = userData.currentRole;
+    if (userData.currentRole !== undefined) dbData.role_title = userData.currentRole;
     if (userData.lookingFor !== undefined) dbData.looking_for = userData.lookingFor;
     if (userData.pictureUrl !== undefined) dbData.picture_url = userData.pictureUrl;
     if (userData.name !== undefined) dbData.name = userData.name;
