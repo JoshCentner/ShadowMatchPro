@@ -38,10 +38,10 @@ export default function Profile() {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || '',
-      organisationId: user?.organisationId || 0,
-      currentRole: user?.currentRole || '',
-      lookingFor: user?.lookingFor || '',
+      name: '',
+      organisationId: 0,
+      currentRole: '',
+      lookingFor: '',
     },
   });
 

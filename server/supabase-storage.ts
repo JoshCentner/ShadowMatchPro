@@ -100,6 +100,9 @@ export class SupabaseStorage implements IStorage {
     if (userData.name !== undefined) dbData.name = userData.name;
     if (userData.organisationId !== undefined) dbData.organisation_id = userData.organisationId;
     
+    // Log the transformation for debugging
+    console.log('Transforming user data:', userData, 'to:', dbData);
+    
     const { data, error } = await supabase
       .from('users')
       .update(dbData)
