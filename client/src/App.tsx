@@ -11,6 +11,7 @@ import Profile from "@/pages/profile";
 import Applications from "@/pages/applications";
 import YourOpportunities from "@/pages/your-opportunities";
 import Auth from "@/pages/auth";
+import AuthCallback from "@/pages/auth-callback";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/applications" component={Applications} />
           <Route path="/your-opportunities" component={YourOpportunities} />
           <Route path="/auth" component={Auth} />
+          <Route path="/auth/callback" component={AuthCallback} />
           <Route component={NotFound} />
         </Switch>
       </div>

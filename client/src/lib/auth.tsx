@@ -3,11 +3,13 @@ import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { User } from '@shared/schema';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from './supabase';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, name: string, organisationId: number) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => void;
   updateProfile: (userData: Partial<User>) => Promise<void>;
 }
@@ -16,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   login: async () => {},
+  loginWithGoogle: async () => {},
   logout: () => {},
   updateProfile: async () => {},
 });
@@ -34,27 +37,81 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const checkUser = async () => {
-      const storedUserId = localStorage.getItem('shadowUserId');
-      
-      if (storedUserId) {
-        try {
-          const response = await fetch(`/api/auth/me?userId=${storedUserId}`, {
-            credentials: 'include',
-          });
-          
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
-          } else {
+      try {
+        // First check for stored userId in localStorage
+        const storedUserId = localStorage.getItem('shadowUserId');
+        
+        if (storedUserId) {
+          try {
+            const response = await fetch(`/api/auth/me?userId=${storedUserId}`, {
+              credentials: 'include',
+            });
+            
+            if (response.ok) {
+              const userData = await response.json();
+              setUser(userData);
+              setIsLoading(false);
+              return;
+            } else {
+              // User ID not valid, remove it
+              localStorage.removeItem('shadowUserId');
+              // Continue to check Supabase session
+            }
+          } catch (error) {
+            console.error('Error checking local authentication:', error);
             localStorage.removeItem('shadowUserId');
+            // Continue to check Supabase session
           }
-        } catch (error) {
-          console.error('Error checking authentication:', error);
-          localStorage.removeItem('shadowUserId');
         }
+        
+        // Check for active Supabase session
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Error checking Supabase session:', sessionError);
+          setIsLoading(false);
+          return;
+        }
+        
+        if (sessionData.session) {
+          const { data: userData, error: userError } = await supabase.auth.getUser();
+          
+          if (userError || !userData.user) {
+            console.error('Error getting Supabase user:', userError);
+            setIsLoading(false);
+            return;
+          }
+          
+          // We have a Supabase user, fetch or create the user in our system
+          const email = userData.user.email;
+          const name = userData.user.user_metadata?.name || 
+                      userData.user.user_metadata?.full_name || 
+                      (email ? email.split('@')[0] : 'User');
+          
+          if (email) {
+            try {
+              // Check if we already have this user in our system
+              const existingUserResponse = await apiRequest('POST', '/api/auth/google-signin', {
+                email,
+                name,
+                pictureUrl: userData.user.user_metadata?.avatar_url
+              });
+              
+              if (existingUserResponse.ok) {
+                const ourUser = await existingUserResponse.json();
+                setUser(ourUser);
+                localStorage.setItem('shadowUserId', ourUser.id.toString());
+              }
+            } catch (error) {
+              console.error('Error syncing Supabase user with our system:', error);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error in auth check:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
     
     checkUser();
@@ -63,12 +120,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (email: string, name: string, organisationId: number) => {
     try {
       setIsLoading(true);
-      const response = await apiRequest('POST', '/api/auth/register', {
+      
+      // Check if we're coming from Google auth
+      const session = await supabase.auth.getSession();
+      const isGoogleAuth = !!session.data.session;
+      
+      // Use the appropriate endpoint based on auth type
+      const endpoint = isGoogleAuth ? '/api/auth/google-signin' : '/api/auth/register';
+      
+      // For Google auth, we might have a picture
+      let pictureUrl: string | undefined;
+      
+      if (isGoogleAuth) {
+        const userData = await supabase.auth.getUser();
+        pictureUrl = userData.data.user?.user_metadata?.avatar_url;
+      }
+      
+      const payload = {
         email,
         name,
         organisationId,
         isAuthenticated: true,
-      });
+        ...(pictureUrl && { pictureUrl })
+      };
+      
+      const response = await apiRequest('POST', endpoint, payload);
       
       const userData = await response.json();
       setUser(userData);
@@ -79,7 +155,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         description: `Welcome, ${userData.name}!`,
       });
       
-      navigate('/');
+      // If user has no org selected, redirect to profile
+      if (!userData.organisationId) {
+        navigate('/profile');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -92,15 +173,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('shadowUserId');
-    navigate('/auth');
-    
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
+  const logout = async () => {
+    try {
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      
+      // Clear local state
+      setUser(null);
+      localStorage.removeItem('shadowUserId');
+      navigate('/auth');
+      
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      
+      // Even if Supabase logout fails, clear local state
+      setUser(null);
+      localStorage.removeItem('shadowUserId');
+      navigate('/auth');
+      
+      toast({
+        title: "Signed out",
+        description: "You have been signed out, but there was an issue with the authentication provider.",
+      });
+    }
   };
 
   const updateProfile = async (userData: Partial<User>) => {
@@ -124,9 +223,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
     }
   };
+  
+  const loginWithGoogle = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Redirect to Google OAuth
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Nothing more to do here as user will be redirected to Google
+      // The callback will handle the rest of the authentication flow
+      
+    } catch (error) {
+      console.error('Google login error:', error);
+      toast({
+        title: "Google Authentication failed",
+        description: "Could not sign in with Google. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

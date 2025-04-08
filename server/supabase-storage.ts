@@ -342,7 +342,7 @@ export class SupabaseStorage implements IStorage {
         let successfulApplicant: User | undefined;
         
         if (successfulApp) {
-          successfulApplicant = await this.getUserById(successfulApp.user_id);
+          successfulApplicant = await this.getUserById(successfulApp.userId);
         }
         
         return {

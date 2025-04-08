@@ -1,13 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Get Supabase credentials from environment variables
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Supabase credentials are missing');
-  process.exit(1);
-}
 
 const AVATARS_BUCKET = 'profile-images';
 
@@ -16,49 +15,66 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function createBucket() {
   try {
-    // Check if the bucket exists
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    console.log(`Attempting to create storage bucket ${AVATARS_BUCKET}...`);
     
-    if (listError) {
-      console.error('Error checking buckets:', listError.message);
-      return;
-    }
+    // Try to create the bucket
+    const { data, error } = await supabase.storage.createBucket(AVATARS_BUCKET, {
+      public: true,
+      fileSizeLimit: 5 * 1024 * 1024, // 5MB limit
+      allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+    });
     
-    const bucketExists = buckets.some(bucket => bucket.name === AVATARS_BUCKET);
-    
-    if (bucketExists) {
-      console.log(`Bucket ${AVATARS_BUCKET} already exists.`);
-      
-      // Update bucket to be public
-      const { error: updateError } = await supabase.storage.updateBucket(AVATARS_BUCKET, {
-        public: true,
-        fileSizeLimit: 5 * 1024 * 1024,
-        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
-      });
-      
-      if (updateError) {
-        console.error('Error updating bucket:', updateError.message);
+    if (error) {
+      if (error.message.includes('already exists')) {
+        console.log(`Bucket ${AVATARS_BUCKET} already exists.`);
+        
+        // Update bucket to ensure it's public
+        const { error: updateError } = await supabase.storage.updateBucket(AVATARS_BUCKET, {
+          public: true
+        });
+        
+        if (updateError) {
+          console.error(`Error updating bucket to public: ${updateError.message}`);
+        } else {
+          console.log(`Bucket ${AVATARS_BUCKET} updated to be public.`);
+        }
       } else {
-        console.log(`Updated bucket ${AVATARS_BUCKET} settings.`);
+        console.error(`Error creating bucket: ${error.message}`);
       }
     } else {
-      // Create bucket
-      const { error: createError } = await supabase.storage.createBucket(AVATARS_BUCKET, {
-        public: true,
-        fileSizeLimit: 5 * 1024 * 1024,
-        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
-      });
-      
-      if (createError) {
-        console.error('Error creating bucket:', createError.message);
-      } else {
-        console.log(`Created bucket ${AVATARS_BUCKET}.`);
-      }
+      console.log(`Successfully created storage bucket ${AVATARS_BUCKET}`);
     }
-  } catch (err) {
-    console.error('Unexpected error:', err);
+    
+    // Create or update a public policy for the bucket
+    try {
+      const policyName = `${AVATARS_BUCKET}-public-policy`;
+      
+      // Try to update policy first (in case it exists)
+      const { error: policyError } = await supabase.storage.from(AVATARS_BUCKET).updateBucketPolicy(
+        '*',
+        'SELECT'
+      );
+      
+      if (policyError) {
+        console.error(`Error updating bucket policy: ${policyError.message}`);
+      } else {
+        console.log(`Successfully updated bucket policy to allow public access`);
+      }
+    } catch (policyError) {
+      console.error(`Error with bucket policy: ${policyError.message}`);
+    }
+    
+  } catch (error) {
+    console.error(`Unexpected error: ${error.message}`);
   }
 }
 
-createBucket();
-
+// Execute the function
+createBucket()
+  .then(() => {
+    console.log('Operation completed');
+  })
+  .catch(err => {
+    console.error('Unhandled error:', err);
+    process.exit(1);
+  });

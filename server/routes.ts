@@ -46,6 +46,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Google Sign In handler
+  apiRouter.post("/auth/google-signin", async (req: Request, res: Response) => {
+    try {
+      const { email, name, pictureUrl } = req.body;
+      
+      if (!email || !name) {
+        return res.status(400).json({ message: 'Email and name are required' });
+      }
+      
+      // Check if user already exists
+      let user = await storage.getUserByEmail(email);
+      
+      if (user) {
+        // If user exists, update their profile if needed
+        const needsUpdate = 
+          (pictureUrl && user.pictureUrl !== pictureUrl) || 
+          (user.name !== name);
+        
+        if (needsUpdate) {
+          const updateData: Partial<typeof user> = {};
+          
+          if (pictureUrl && user.pictureUrl !== pictureUrl) {
+            updateData.pictureUrl = pictureUrl;
+          }
+          
+          if (user.name !== name) {
+            updateData.name = name;
+          }
+          
+          const updatedUser = await storage.updateUser(user.id, updateData);
+          if (updatedUser) {
+            user = updatedUser;
+          }
+        }
+        
+        return res.json(user);
+      }
+      
+      // Create new user - organization will be set during first profile visit
+      const newUser = await storage.createUser({
+        email,
+        name,
+        isAuthenticated: true,
+        pictureUrl
+      });
+      
+      res.json(newUser);
+    } catch (error: any) {
+      console.error('Error in Google sign-in:', error);
+      res.status(500).json({ message: 'Failed to authenticate with Google' });
+    }
+  });
+
   // Get current user
   apiRouter.get("/auth/me", async (req: Request, res: Response) => {
     const userId = req.query.userId as string;
