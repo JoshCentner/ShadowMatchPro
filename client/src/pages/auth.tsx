@@ -21,7 +21,8 @@ export default function Auth() {
       setIsManualLoading(true);
       
       // Check for bypass auth mode
-      if (import.meta.env.VITE_BYPASS_AUTH === 'true') {
+      const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true' || import.meta.env.VITE_BYPASS_AUTH === true;
+      if (bypassAuth) {
         await login('test@example.com', 'Test User', 1);
         return;
       }
@@ -74,7 +75,8 @@ export default function Auth() {
     if (isLoading || isManualLoading) return;
     
     // Check for bypass auth mode
-    if (import.meta.env.VITE_BYPASS_AUTH === 'true') {
+    const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true' || import.meta.env.VITE_BYPASS_AUTH === true;
+    if (bypassAuth) {
       login('test@example.com', 'Test User', 1);
       return;
     }
