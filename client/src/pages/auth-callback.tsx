@@ -47,8 +47,22 @@ export default function AuthCallback() {
         // Pass to our backend to create/get user
         await login(email, name, 0); // 0 for now, user will choose org in profile
         
-        // Redirect to home page after successful login
-        setLocation("/profile");
+        // Get the return URL from query params
+        const params = new URLSearchParams(window.location.search);
+        const returnTo = params.get('returnTo') || '/';
+        
+        // If returnTo is from a different origin, default to home
+        try {
+          const returnToUrl = new URL(returnTo);
+          if (returnToUrl.origin === window.location.origin) {
+            setLocation(returnToUrl.pathname + returnToUrl.search);
+          } else {
+            setLocation('/');
+          }
+        } catch {
+          // If returnTo is just a path, use it
+          setLocation(returnTo);
+        }
       } catch (err) {
         console.error("Error handling auth callback:", err);
         setError("Failed to complete authentication. Please try again.");

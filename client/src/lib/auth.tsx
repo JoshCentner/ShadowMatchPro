@@ -232,9 +232,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback${window.location.search}`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            returnTo: window.location.origin
+            returnTo: window.location.href
           }
         },
       });
