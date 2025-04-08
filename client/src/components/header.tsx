@@ -31,17 +31,17 @@ export default function Header() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
-                <Users className="h-8 w-8 text-primary" />
-                <span className="ml-2 text-xl font-semibold text-gray-900">Shadow App</span>
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                <span className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 truncate">Shadow App</span>
               </Link>
             </div>
           </div>
           
           {user ? (
-            <div className="ml-4 flex items-center md:ml-6">
+            <div className="ml-2 sm:ml-4 flex items-center md:ml-6">
               <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="max-w-xs bg-gray-50 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <Button variant="ghost" className="max-w-[140px] sm:max-w-xs bg-gray-50 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                     <span className="sr-only">Open user menu</span>
                     <Avatar className="h-8 w-8">
                       {user.pictureUrl ? (
