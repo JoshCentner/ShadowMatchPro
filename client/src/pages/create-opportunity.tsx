@@ -1,35 +1,54 @@
-import { useEffect, useState } from 'react';
-import { useRoute, useLocation, Link } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronLeft } from 'lucide-react';
-import NavigationTabs from '@/components/navigation-tabs';
-import { useAuth } from '@/lib/auth';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-import { queryClient } from '@/lib/queryClient';
-import { insertOpportunitySchema } from '@shared/schema';
-import { useOrganisations } from '@/lib/organisations';
+import { useEffect, useState } from "react";
+import { useRoute, useLocation, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronLeft } from "lucide-react";
+import NavigationTabs from "@/components/navigation-tabs";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { insertOpportunitySchema } from "@shared/schema";
+import { useOrganisations } from "@/lib/organisations";
 
 // Form validation schema
 const createOpportunitySchema = insertOpportunitySchema.extend({
   // We keep the array but it's not used in the UI anymore
-  learningAreaIds: z.array(z.number()).default([])
+  learningAreaIds: z.array(z.number()).default([]),
 });
 
 export default function CreateOpportunity() {
   const [, navigate] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
-  const [matchedRoute, params] = useRoute('/edit-opportunity/:id');
+  const [matchedRoute, params] = useRoute("/edit-opportunity/:id");
   const opportunityId = matchedRoute && params?.id ? parseInt(params.id) : null;
   const { user } = useAuth();
   const { toast } = useToast();
@@ -37,7 +56,7 @@ export default function CreateOpportunity() {
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
-      navigate('/auth');
+      navigate("/auth");
     }
   }, [user, navigate]);
 
@@ -46,7 +65,7 @@ export default function CreateOpportunity() {
 
   // Fetch learning areas
   const { data: learningAreas, isLoading: isLoadingAreas } = useQuery({
-    queryKey: ['/api/learning-areas'],
+    queryKey: ["/api/learning-areas"],
   });
 
   // Fetch opportunity if editing
@@ -59,14 +78,14 @@ export default function CreateOpportunity() {
   const form = useForm<z.infer<typeof createOpportunitySchema>>({
     resolver: zodResolver(createOpportunitySchema),
     defaultValues: {
-      title: '',
-      description: '',
-      format: 'In-Person',
-      durationLimit: '1 Day',
+      title: "",
+      description: "",
+      format: "In-Person",
+      durationLimit: "1 Day",
       organisationId: user?.organisationId || 0,
       createdByUserId: user?.id || 0,
-      status: 'Open',
-      hostDetails: '',
+      status: "Open",
+      hostDetails: "",
       learningAreaIds: [],
     },
   });
@@ -89,9 +108,9 @@ export default function CreateOpportunity() {
   const onSubmit = async (data: z.infer<typeof createOpportunitySchema>) => {
     if (!user) {
       toast({
-        title: 'Authentication required',
-        description: 'Please sign in to create opportunities',
-        variant: 'destructive',
+        title: "Authentication required",
+        description: "Please sign in to create opportunities",
+        variant: "destructive",
       });
       return;
     }
@@ -99,37 +118,42 @@ export default function CreateOpportunity() {
     try {
       if (isEditing && opportunityId) {
         // Update existing opportunity
-        await apiRequest('PUT', `/api/opportunities/${opportunityId}`, data);
+        await apiRequest("PUT", `/api/opportunities/${opportunityId}`, data);
 
         toast({
-          title: 'Opportunity updated',
-          description: 'The shadowing opportunity has been updated successfully',
+          title: "Opportunity updated",
+          description:
+            "The shadowing opportunity has been updated successfully",
         });
       } else {
         // Create new opportunity
-        await apiRequest('POST', '/api/opportunities', {
+        await apiRequest("POST", "/api/opportunities", {
           ...data,
           createdByUserId: user.id,
         });
 
         toast({
-          title: 'Opportunity created',
-          description: 'Your shadowing opportunity has been created successfully',
+          title: "Opportunity created",
+          description:
+            "Your shadowing opportunity has been created successfully",
         });
       }
 
       // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/opportunities'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${user.id}/opportunities`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/opportunities"] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/users/${user.id}/opportunities`],
+      });
 
       // Redirect to home page
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Error creating opportunity:', error);
+      console.error("Error creating opportunity:", error);
       toast({
-        title: 'Submission failed',
-        description: 'There was an error creating your opportunity. Please try again.',
-        variant: 'destructive',
+        title: "Submission failed",
+        description:
+          "There was an error creating your opportunity. Please try again.",
+        variant: "destructive",
       });
     }
   };
@@ -153,15 +177,23 @@ export default function CreateOpportunity() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{isEditing ? 'Edit Shadowing Opportunity' : 'Create New Shadowing Opportunity'}</CardTitle>
+              <CardTitle>
+                {isEditing
+                  ? "Edit Shadowing Opportunity"
+                  : "Create New Shadowing Opportunity"}
+              </CardTitle>
               <CardDescription>
-                Provide details about the shadowing opportunity you'd like to offer.
+                Provide details about the shadowing opportunity you'd like to
+                offer.
               </CardDescription>
             </CardHeader>
 
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={form.control}
                     name="organisationId"
@@ -170,7 +202,9 @@ export default function CreateOpportunity() {
                         <FormLabel>Your Organisation</FormLabel>
                         <Select
                           disabled={isLoadingOrgs}
-                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          onValueChange={(value) =>
+                            field.onChange(parseInt(value))
+                          }
                           value={field.value.toString()}
                         >
                           <FormControl>
@@ -180,7 +214,10 @@ export default function CreateOpportunity() {
                           </FormControl>
                           <SelectContent>
                             {organisations?.map((org) => (
-                              <SelectItem key={org.id} value={org.id.toString()}>
+                              <SelectItem
+                                key={org.id}
+                                value={org.id.toString()}
+                              >
                                 {org.name}
                               </SelectItem>
                             ))}
@@ -198,7 +235,10 @@ export default function CreateOpportunity() {
                       <FormItem>
                         <FormLabel>Your Role Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. Product Manager" {...field} />
+                          <Input
+                            placeholder="e.g. Product Manager"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -250,7 +290,9 @@ export default function CreateOpportunity() {
                             <SelectItem value="1 Hour">1 Hour</SelectItem>
                             <SelectItem value="Half-Day">Half-Day</SelectItem>
                             <SelectItem value="1 Day">1 Day</SelectItem>
-                            <SelectItem value="2 Half-Days">2 Half-Days</SelectItem>
+                            <SelectItem value="2 Half-Days">
+                              2 Half-Days
+                            </SelectItem>
                             <SelectItem value="2 Days">2 Days</SelectItem>
                           </SelectContent>
                         </Select>
@@ -258,8 +300,6 @@ export default function CreateOpportunity() {
                       </FormItem>
                     )}
                   />
-
-
 
                   <FormField
                     control={form.control}
@@ -269,13 +309,14 @@ export default function CreateOpportunity() {
                         <FormLabel>Host Details</FormLabel>
                         <FormControl>
                           <div className="space-y-2">
-                            <Textarea 
-                              placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints." 
+                            <Textarea
+                              placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints."
+                              rows={4}
                               maxLength={280}
                               {...field}
                             />
                             <div className="text-xs text-muted-foreground text-right">
-                              {(field.value?.length ?? 0)}/280
+                              {field.value?.length ?? 0}/280
                             </div>
                           </div>
                         </FormControl>
@@ -296,13 +337,12 @@ export default function CreateOpportunity() {
                               placeholder="- Understand how product teams operate in a large org
 - Learn about agile delivery practices and ceremonies
                               - Cross team collaboration"
-                              rows={6}
-                              className="min-h-[150px]"
+                              rows={4}
                               maxLength={280}
                               {...field}
                             />
                             <div className="text-xs text-muted-foreground text-right">
-                              {(field.value?.length ?? 0)}/280
+                              {field.value?.length ?? 0}/280
                             </div>
                           </div>
                         </FormControl>
@@ -316,7 +356,7 @@ export default function CreateOpportunity() {
                       <Link href="/">Cancel</Link>
                     </Button>
                     <Button type="submit">
-                      {isEditing ? 'Update Opportunity' : 'Create Opportunity'}
+                      {isEditing ? "Update Opportunity" : "Create Opportunity"}
                     </Button>
                   </div>
                 </form>
