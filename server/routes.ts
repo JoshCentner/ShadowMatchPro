@@ -2,12 +2,26 @@ import { Router, type Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./supabase-storage";
 import { z } from "zod";
+import { db } from "./db";
 import { 
   insertUserSchema, 
   insertOpportunitySchema, 
   insertApplicationSchema, 
   insertSuccessfulApplicationSchema
 } from "@shared/schema";
+
+const handleDbOperation = async (operation: () => Promise<any>, fallback: any) => {
+  if (!db) {
+    console.warn('Database operation attempted but database is not connected');
+    return fallback;
+  }
+  try {
+    return await operation();
+  } catch (error) {
+    console.error('Database operation failed:', error);
+    return fallback;
+  }
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
