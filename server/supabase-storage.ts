@@ -45,6 +45,7 @@ export interface IStorage {
 
 export class SupabaseStorage implements IStorage {
   async getUserById(id: number): Promise<User | undefined> {
+    console.log(`Storage - Fetching user with ID: ${id}`);
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -56,6 +57,7 @@ export class SupabaseStorage implements IStorage {
       return undefined;
     }
     
+    console.log('Storage - Retrieved user data:', data);
     return data as User;
   }
   
@@ -92,6 +94,9 @@ export class SupabaseStorage implements IStorage {
   }
   
   async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    console.log('Storage - Updating user with ID:', id);
+    console.log('Storage - Input user data:', userData);
+    
     // Transform data to match database field names
     const dbData: Record<string, any> = {};
     if (userData.currentRole !== undefined) dbData.current_role = userData.currentRole;
@@ -100,8 +105,7 @@ export class SupabaseStorage implements IStorage {
     if (userData.name !== undefined) dbData.name = userData.name;
     if (userData.organisationId !== undefined) dbData.organisation_id = userData.organisationId;
     
-    // Log the transformation for debugging
-    console.log('Transforming user data:', userData, 'to:', dbData);
+    console.log('Storage - Transformed data for DB:', dbData);
     
     const { data, error } = await supabase
       .from('users')

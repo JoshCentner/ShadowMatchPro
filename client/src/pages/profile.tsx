@@ -54,13 +54,16 @@ export default function Profile() {
 
   // Update form when user data changes
   useEffect(() => {
+    console.log('Profile - Current user data:', user);
     if (user) {
-      form.reset({
+      const formData = {
         name: user.name,
         organisationId: user.organisationId || 0,
         currentRole: user.currentRole || '',
         lookingFor: user.lookingFor || '',
-      });
+      };
+      console.log('Profile - Setting form data:', formData);
+      form.reset(formData);
     }
   }, [user, form]);
 
