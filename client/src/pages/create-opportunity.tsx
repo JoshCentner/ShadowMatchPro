@@ -33,7 +33,7 @@ export default function CreateOpportunity() {
   const opportunityId = matchedRoute && params?.id ? parseInt(params.id) : null;
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
@@ -43,18 +43,18 @@ export default function CreateOpportunity() {
 
   // Fetch organisations
   const { data: organisations, isLoading: isLoadingOrgs } = useOrganisations();
-  
+
   // Fetch learning areas
   const { data: learningAreas, isLoading: isLoadingAreas } = useQuery({
     queryKey: ['/api/learning-areas'],
   });
-  
+
   // Fetch opportunity if editing
   const { data: opportunity, isLoading: isLoadingOpportunity } = useQuery({
     queryKey: [`/api/opportunities/${opportunityId}`],
     enabled: !!opportunityId,
   });
-  
+
   // Set up form with react-hook-form
   const form = useForm<z.infer<typeof createOpportunitySchema>>({
     resolver: zodResolver(createOpportunitySchema),
@@ -70,12 +70,12 @@ export default function CreateOpportunity() {
       learningAreaIds: [],
     },
   });
-  
+
   // Set form values when editing and data is loaded
   useEffect(() => {
     if (opportunityId && opportunity && !isLoadingOpportunity) {
       setIsEditing(true);
-      
+
       // Set form values
       form.reset({
         ...opportunity,
@@ -95,12 +95,12 @@ export default function CreateOpportunity() {
       });
       return;
     }
-    
+
     try {
       if (isEditing && opportunityId) {
         // Update existing opportunity
         await apiRequest('PUT', `/api/opportunities/${opportunityId}`, data);
-        
+
         toast({
           title: 'Opportunity updated',
           description: 'The shadowing opportunity has been updated successfully',
@@ -111,17 +111,17 @@ export default function CreateOpportunity() {
           ...data,
           createdByUserId: user.id,
         });
-        
+
         toast({
           title: 'Opportunity created',
           description: 'Your shadowing opportunity has been created successfully',
         });
       }
-      
+
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/opportunities'] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${user.id}/opportunities`] });
-      
+
       // Redirect to home page
       navigate('/');
     } catch (error) {
@@ -137,7 +137,7 @@ export default function CreateOpportunity() {
   return (
     <>
       <NavigationTabs />
-      
+
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
@@ -158,7 +158,7 @@ export default function CreateOpportunity() {
                 Provide details about the shadowing opportunity you'd like to offer.
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -290,15 +290,20 @@ export default function CreateOpportunity() {
                       <FormItem>
                         <FormLabel>What will they learn?</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="- Innovation in a regulated industry
-- Product practices at scale
+                          <div className="space-y-2">
+                            <Textarea
+                              placeholder="- Understand how product teams operate in a large org
+- Learn about agile delivery practices and ceremonies
 - Cross team collaboration"
-                            rows={6}
-                            className="min-h-[150px]"
-                            maxLength={280}
-                            {...field}
-                          />
+                              rows={6}
+                              className="min-h-[150px]"
+                              maxLength={280}
+                              {...field}
+                            />
+                            <div className="text-xs text-muted-foreground text-right">
+                              {(field.value?.length ?? 0)}/280
+                            </div>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
