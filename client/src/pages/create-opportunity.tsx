@@ -92,17 +92,18 @@ export default function CreateOpportunity() {
 
   // Set form values when editing and data is loaded
   useEffect(() => {
-    if (opportunityId && opportunity && !isLoadingOpportunity) {
+    if (opportunityId && opportunity && !isLoadingOpportunity && !isLoadingOrgs) {
       setIsEditing(true);
 
       // Set form values
       form.reset({
         ...opportunity,
+        organisationId: opportunity.organisationId || user?.organisationId || 0,
         // Use empty array for learningAreaIds as we removed the UI for it
         learningAreaIds: [],
       });
     }
-  }, [opportunity, opportunityId, isLoadingOpportunity, form]);
+  }, [opportunity, opportunityId, isLoadingOpportunity, isLoadingOrgs, form, user?.organisationId]);
 
   // Handle form submission
   const onSubmit = async (data: z.infer<typeof createOpportunitySchema>) => {
