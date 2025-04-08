@@ -239,8 +239,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const opportunityId = parseInt(req.params.id);
       const opportunityData = insertOpportunitySchema.partial().parse(req.body);
+
+      // Ensure host details and organisation ID are included in update
+      const updateData = {
+        ...opportunityData,
+        host_details: opportunityData.hostDetails,
+        organisation_id: opportunityData.organisationId
+      };
       
-      const updatedOpportunity = await storage.updateOpportunity(opportunityId, opportunityData);
+      const updatedOpportunity = await storage.updateOpportunity(opportunityId, updateData);
       
       if (!updatedOpportunity) {
         return res.status(404).json({ message: "Opportunity not found" });
