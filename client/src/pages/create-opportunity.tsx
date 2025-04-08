@@ -268,7 +268,15 @@ export default function CreateOpportunity() {
                       <FormItem>
                         <FormLabel>Host Details</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints." onChange={field.onChange} onBlur={field.onBlur} name={field.name} ref={field.ref} value={field.value ?? ''} />
+                          <Textarea 
+                            placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints." 
+                            onChange={field.onChange} 
+                            onBlur={field.onBlur} 
+                            name={field.name} 
+                            ref={field.ref} 
+                            value={field.value ?? ''} 
+                            maxLength={280}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -288,6 +296,7 @@ export default function CreateOpportunity() {
 - Cross team collaboration"
                             rows={6}
                             className="min-h-[150px]"
+                            maxLength={280}
                             {...field}
                           />
                         </FormControl>
