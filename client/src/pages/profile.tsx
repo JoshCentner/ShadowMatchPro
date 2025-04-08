@@ -108,9 +108,16 @@ export default function Profile() {
     try {
       setIsUploading(true);
       
+      // Show initial toast
+      toast({
+        title: "Uploading profile picture",
+        description: "Your profile picture is being uploaded...",
+      });
+      
       // Upload image to Supabase
       const publicUrl = await uploadProfileImage(file, user.id);
       
+      // If we get here, the upload was successful
       // Update user profile with new image URL
       await updateProfile({ pictureUrl: publicUrl });
       
@@ -118,11 +125,30 @@ export default function Profile() {
         title: "Profile picture updated",
         description: "Your profile picture has been successfully updated.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading profile image:', error);
+      
+      // Handle specific error messages
+      let errorMessage = "Could not upload your profile picture. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes('not initialized')) {
+          errorMessage = "The storage system is initializing. Please try again in a moment.";
+        } else if (error.message.includes('not set up') || error.message.includes('does not exist')) {
+          errorMessage = "The profile image storage is not properly set up. Please contact an administrator.";
+        } else if (error.message.includes('policy')) {
+          errorMessage = "You don't have permission to upload files. Please contact an administrator.";
+        } else if (error.message.includes('5MB')) {
+          errorMessage = "The file size exceeds the maximum allowed size (5MB).";
+        } else {
+          // Use the actual error message when available
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Upload failed",
-        description: "Could not upload your profile picture. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

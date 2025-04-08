@@ -15,7 +15,7 @@ export const AVATARS_BUCKET = 'profile-images';
 // Create a Supabase client
 export const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
-// Check storage bucket for profile images
+// Check and create storage bucket for profile images if needed
 export async function checkStorageBuckets() {
   try {
     if (!supabaseUrl || !supabaseKey) {
@@ -23,31 +23,58 @@ export async function checkStorageBuckets() {
       return;
     }
     
-    // Check if the profile images bucket exists
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    // Directly try to get the bucket first (more reliable than listing in some cases)
+    let { data: bucketData, error: getBucketError } = await supabase.storage.getBucket(AVATARS_BUCKET);
     
-    if (listError) {
-      log(`Error checking storage buckets: ${listError.message}`, 'error');
-      return;
-    }
-    
-    // Check if our bucket already exists
-    const bucketExists = buckets?.some(bucket => bucket.name === AVATARS_BUCKET);
-    
-    if (bucketExists) {
+    // If we get specific errors, we'll try listing buckets as a fallback
+    if (getBucketError && (getBucketError.message.includes('not found') || getBucketError.message.includes('does not exist'))) {
+      // Try listing buckets as a backup approach
+      const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+      
+      if (listError) {
+        log(`Error checking storage buckets: ${listError.message}`, 'error');
+        return;
+      }
+      
+      // Check if our bucket already exists
+      const bucketExists = buckets?.some(bucket => bucket.name === AVATARS_BUCKET);
+      
+      if (bucketExists) {
+        log(`Storage bucket ${AVATARS_BUCKET} is available (found via list)`, 'express');
+      } else {
+        log(`Attempting to create storage bucket ${AVATARS_BUCKET}...`, 'express');
+        
+        // Try to create the bucket
+        const { data: newBucket, error: createError } = await supabase.storage.createBucket(AVATARS_BUCKET, {
+          public: true,
+          fileSizeLimit: 5 * 1024 * 1024, // 5MB limit
+          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+        });
+        
+        if (createError) {
+          if (createError.message.includes('already exists')) {
+            log(`Bucket ${AVATARS_BUCKET} already exists but couldn't be listed`, 'express');
+          } else if (createError.message.includes('policy')) {
+            log(`Unable to create bucket ${AVATARS_BUCKET} due to permissions. Please create it in the Supabase dashboard.`, 'express');
+            log(`File uploads may fail until the bucket is created.`, 'express');
+          } else {
+            log(`Error creating bucket: ${createError.message}`, 'error');
+            log(`File uploads may fail until the bucket is created.`, 'express');
+          }
+        } else {
+          log(`Successfully created storage bucket ${AVATARS_BUCKET}`, 'express');
+        }
+      }
+    } else if (getBucketError) {
+      log(`Error getting bucket details: ${getBucketError.message}`, 'error');
+      log(`File uploads may fail until bucket issues are resolved.`, 'express');
+    } else {
+      // Bucket exists and we got its details
       log(`Storage bucket ${AVATARS_BUCKET} is available`, 'express');
       
-      // Get bucket public status
-      const { data, error: getError } = await supabase.storage.getBucket(AVATARS_BUCKET);
-      
-      if (getError) {
-        log(`Error getting bucket details: ${getError.message}`, 'error');
-      } else if (data && !data.public) {
+      if (bucketData && !bucketData.public) {
         log(`Note: The ${AVATARS_BUCKET} bucket is not public, image URLs may not be directly accessible`, 'express');
       }
-    } else {
-      log(`Storage bucket ${AVATARS_BUCKET} does not exist. You may need to create it in the Supabase dashboard.`, 'express');
-      log(`File uploads may fail until the bucket is created.`, 'express');
     }
   } catch (error: any) {
     log(`Error checking storage: ${error.message}`, 'error');

@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
+// Define storage bucket name - must match the server-side bucket name
+const AVATARS_BUCKET = 'profile-images';
+
 // Create a mock Supabase client first with dummy methods
 // This allows us to avoid the immediate "supabaseUrl is required" error
 // while we wait for the real configuration to load
@@ -8,6 +11,7 @@ const createMockClient = () => {
   return {
     storage: {
       getBucket: async () => ({ data: null, error: new Error('Mock client - not initialized') }),
+      createBucket: async () => ({ data: null, error: new Error('Mock client - not initialized') }),
       from: () => ({
         upload: async () => ({ data: null, error: new Error('Mock client - not initialized') }),
         getPublicUrl: () => ({ data: { publicUrl: '' } })
@@ -19,10 +23,11 @@ const createMockClient = () => {
 // Start with a mock client
 let supabaseClient = createMockClient();
 let isInitialized = false;
+let bucketExists = false;
 
 // Fetch config from server
 async function initSupabase() {
-  if (isInitialized) return;
+  if (isInitialized) return supabaseClient;
   
   try {
     const response = await fetch('/api/config');
@@ -35,15 +40,51 @@ async function initSupabase() {
     
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error('Supabase credentials are missing from server config');
-      return;
+      return supabaseClient;
     }
     
     // Create the real client with actual credentials
     supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
     isInitialized = true;
     console.log('Supabase client initialized successfully');
+    
+    // Check if bucket exists right away
+    await checkBucket();
+    
+    return supabaseClient;
   } catch (error) {
     console.error('Failed to initialize Supabase client:', error);
+    return supabaseClient;
+  }
+}
+
+// Check if the storage bucket exists
+async function checkBucket() {
+  if (!isInitialized) return false;
+  
+  try {
+    // Try to get the bucket
+    const { data, error } = await supabaseClient.storage.getBucket(AVATARS_BUCKET);
+    
+    if (error) {
+      if (error.message.includes('does not exist') || error.message.includes('not found')) {
+        console.log(`Storage bucket ${AVATARS_BUCKET} doesn't exist`);
+        bucketExists = false;
+        return false;
+      } else {
+        console.error(`Error checking bucket: ${error.message}`);
+        bucketExists = false;
+        return false;
+      }
+    }
+    
+    console.log(`Storage bucket ${AVATARS_BUCKET} exists`);
+    bucketExists = true;
+    return true;
+  } catch (error) {
+    console.error('Error checking bucket:', error);
+    bucketExists = false;
+    return false;
   }
 }
 
@@ -53,8 +94,8 @@ initSupabase();
 // Export the client - it will be updated when initialization completes
 export const supabase = supabaseClient;
 
-// Define storage bucket name - must match the server-side bucket name
-export const AVATARS_BUCKET = 'profile-images';
+// Export the bucket name
+export { AVATARS_BUCKET };
 
 /**
  * Upload a profile image to Supabase storage
@@ -113,13 +154,14 @@ export async function uploadProfileImage(file: File, userId: number): Promise<st
       });
     
     if (error) {
-      // Handle specific error cases
+      // Handle permission errors (RLS policies)
       if (error.message.includes('policy')) {
         throw new Error(
-          'You do not have permission to upload files. Please contact an administrator.'
+          'You do not have permission to upload files. Please make sure Storage RLS policies are configured correctly.'
         );
       }
       
+      // Handle other errors
       if (error.message.includes('not initialized')) {
         throw new Error(
           'Supabase storage is not yet initialized. Please try again in a moment.'
