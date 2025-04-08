@@ -22,7 +22,8 @@ import { useOrganisations } from '@/lib/organisations';
 
 // Form validation schema
 const createOpportunitySchema = insertOpportunitySchema.extend({
-  learningAreaIds: z.array(z.number())
+  // We keep the array but it's not used in the UI anymore
+  learningAreaIds: z.array(z.number()).default([])
 });
 
 export default function CreateOpportunity() {
@@ -78,7 +79,8 @@ export default function CreateOpportunity() {
       // Set form values
       form.reset({
         ...opportunity,
-        learningAreaIds: opportunity.learningAreas.map(area => area.id),
+        // Use empty array for learningAreaIds as we removed the UI for it
+        learningAreaIds: [],
       });
     }
   }, [opportunity, opportunityId, isLoadingOpportunity, form]);
@@ -257,45 +259,7 @@ export default function CreateOpportunity() {
                     )}
                   />
 
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Unique Experience Areas</h3>
-                    <p className="text-sm text-gray-500 mb-4">What will applicants learn from this shadowing opportunity?</p>
-                    
-                    <div className="space-y-2">
-                      {isLoadingAreas ? (
-                        <div className="text-sm text-gray-500">Loading learning areas...</div>
-                      ) : (
-                        learningAreas?.map((area) => (
-                          <FormField
-                            key={area.id}
-                            control={form.control}
-                            name="learningAreaIds"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(area.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, area.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== area.id
-                                            )
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  {area.name}
-                                </FormLabel>
-                              </FormItem>
-                            )}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
+
 
                   <FormField
                     control={form.control}
