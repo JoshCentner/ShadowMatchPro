@@ -39,12 +39,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Test Supabase connection
-  await testSupabaseConnection();
-  
-  // Run database migration and seeding
-  await migrateDatabase();
-  await seedDatabase();
+  // We're using Drizzle for database migrations now, so we don't need to use Supabase directly
+  // await testSupabaseConnection();
+  // await migrateDatabase();
+  // await seedDatabase();
   
   const server = await registerRoutes(app);
 

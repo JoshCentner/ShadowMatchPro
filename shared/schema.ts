@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp, varchar, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 // Enums
 export const formatEnum = pgEnum('format', ['In-Person', 'Online', 'Hybrid']);
@@ -68,6 +69,73 @@ export const opportunityLearningAreas = pgTable("opportunity_learning_areas", {
   opportunityId: integer("opportunity_id").references(() => opportunities.id).notNull(),
   learningAreaId: integer("learning_area_id").references(() => learningAreas.id).notNull(),
 });
+
+// Define relations
+export const organisationsRelations = relations(organisations, ({ many }) => ({
+  users: many(users),
+  opportunities: many(opportunities)
+}));
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  organisation: one(organisations, {
+    fields: [users.organisationId],
+    references: [organisations.id]
+  }),
+  createdOpportunities: many(opportunities, { relationName: "creator" }),
+  applications: many(applications)
+}));
+
+export const opportunitiesRelations = relations(opportunities, ({ one, many }) => ({
+  organisation: one(organisations, {
+    fields: [opportunities.organisationId],
+    references: [organisations.id]
+  }),
+  creator: one(users, {
+    fields: [opportunities.createdByUserId],
+    references: [users.id],
+    relationName: "creator"
+  }),
+  applications: many(applications),
+  successfulApplication: one(successfulApplications),
+  learningAreaLinks: many(opportunityLearningAreas)
+}));
+
+export const applicationsRelations = relations(applications, ({ one }) => ({
+  user: one(users, {
+    fields: [applications.userId],
+    references: [users.id]
+  }),
+  opportunity: one(opportunities, {
+    fields: [applications.opportunityId],
+    references: [opportunities.id]
+  })
+}));
+
+export const successfulApplicationsRelations = relations(successfulApplications, ({ one }) => ({
+  opportunity: one(opportunities, {
+    fields: [successfulApplications.opportunityId],
+    references: [opportunities.id]
+  }),
+  user: one(users, {
+    fields: [successfulApplications.userId],
+    references: [users.id]
+  })
+}));
+
+export const learningAreasRelations = relations(learningAreas, ({ many }) => ({
+  opportunityLinks: many(opportunityLearningAreas)
+}));
+
+export const opportunityLearningAreasRelations = relations(opportunityLearningAreas, ({ one }) => ({
+  opportunity: one(opportunities, {
+    fields: [opportunityLearningAreas.opportunityId],
+    references: [opportunities.id]
+  }),
+  learningArea: one(learningAreas, {
+    fields: [opportunityLearningAreas.learningAreaId],
+    references: [learningAreas.id]
+  })
+}));
 
 // Insert schemas
 export const insertOrganisationSchema = createInsertSchema(organisations);
