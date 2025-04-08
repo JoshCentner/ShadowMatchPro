@@ -166,20 +166,12 @@ export default function YourOpportunities() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle className="text-center">No opportunities created</CardTitle>
+                <CardTitle className="text-center">Nothing to see here</CardTitle>
               </CardHeader>
               <CardContent className="text-center py-6">
                 <p className="text-gray-500 mb-6">
-                  You haven't created any shadowing opportunities yet.
+                  You haven't created any shadowing opportunities yet, but you could.
                 </p>
-                <Button asChild>
-                  <Link href="/create-opportunity">
-                    <a className="inline-flex items-center">
-                      <Plus className="-ml-1 mr-2 h-5 w-5" />
-                      Create New Opportunity
-                    </a>
-                  </Link>
-                </Button>
               </CardContent>
             </Card>
           )}
