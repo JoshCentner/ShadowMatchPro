@@ -85,13 +85,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create new user - organization will be set during first profile visit
-      const newUser = await storage.createUser({
+      const userData = {
         email,
         name,
-        pictureUrl: pictureUrl || null
-      });
-      
-      res.json(newUser);
+      };
+
+      try {
+        const newUser = await storage.createUser(userData);
+        res.json(newUser);
+      } catch (error: any) {
+        console.error('Error creating user:', error);
+        res.status(500).json({ message: 'Failed to create user account' });
+      }
     } catch (error: any) {
       console.error('Error in Google sign-in:', error);
       res.status(500).json({ message: 'Failed to authenticate with Google' });
