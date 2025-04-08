@@ -1,0 +1,162 @@
+Awesome — thanks for the clear direction. Below is your **complete Product Requirements Document (PRD)** for the cross-organisation shadowing app MVP, including all requested sections.
+
+---
+
+## 📄 Product Requirements Document (PRD)
+### **Project:** Cross-Organisation Shadowing Platform  
+### **Purpose:** Facilitate structured, 1:1 job shadowing experiences across participating organisations  
+### **Target Users:** Employees & Leaders from predefined partner organisations  
+---
+
+### 🔰 Introduction
+
+This product enables cross-organisation shadowing between employees, such as a PM from SEEK shadowing a PM from REA. The goal is to improve **knowledge sharing**, **skills uplift**, **career development**, **relationship building**, and **retention**.
+
+The platform simplifies finding, applying for, and managing shadowing opportunities between trusted partner organisations.
+
+---
+
+### 🚀 MVP Scope
+
+#### Core Functionality
+
+- **Authentication:** Google Sign-In only
+- **Organisations:** Predefined; selectable by users but not user-created
+- **Opportunities:**
+  - Created by authenticated users
+  - Linked to a specific organisation
+  - Include format (In-person / Online / Hybrid)
+  - Include max commitment (e.g., 1 day, 2 half-days)
+  - Status: Open, Closed, or Filled
+- **Applications:**
+  - Users apply to an open opportunity
+  - Creators can view all applicants
+  - Creators accept one (auto-rejecting others)
+  - Applicants can view the status of the opportunity
+
+---
+
+### 👤 User Types
+
+| User Role      | Description                                    |
+|----------------|------------------------------------------------|
+| **Applicant**  | Any logged-in user looking to shadow others    |
+| **Creator**    | Logged-in user who creates and manages shadowing opportunities |
+
+---
+
+### 🧩 Key Features
+
+#### ✅ Authentication
+- Google Sign-In only
+- User must be associated with one of the hardcoded organisations
+
+#### ✅ Opportunity Management
+- **Create**: Title, Description, Organisation, Format, Max Duration
+- **Edit/Delete** (only by creator)
+- **View Listings**: All users can browse
+- **View Details**: Full opportunity info
+
+#### ✅ Application Management
+- Apply to open opportunities
+- Creators can:
+  - View all applicants
+  - Accept one applicant (auto-closes the opportunity)
+- Applicants can view status:
+  - Open / Closed / Filled
+
+---
+
+### 👤 User Stories
+
+#### As an Applicant:
+- I want to browse available shadowing opportunities so I can find relevant ones.
+- I want to apply to an opportunity to express interest in shadowing.
+- I want to see the status of an opportunity (open, closed, filled) after I apply.
+
+#### As a Creator:
+- I want to create a shadowing opportunity with required details (format, org, time commitment).
+- I want to see who applied to my opportunity.
+- I want to select one person to shadow, which should automatically close the opportunity and decline others.
+
+---
+
+### 🧱 Data Model & Relationships
+
+```
++---------------------+         +----------------------+
+|        User         |         |     Organisation     |
++---------------------+         +----------------------+
+| id                  |         | id                   |
+| email               |         | name                 |
+| organisation_id     |         +----------------------+
+| is_authenticated    |
++---------------------+
+        |                                
+        | 1                            n 
+        +-----------< Owns >-------------+
+                        |
+                        v
+              +------------------+
+              |   Opportunity    |
+              +------------------+
+              | id               |
+              | title            |
+              | description      |
+              | format           |
+              | duration_limit   |
+              | status           | -> (Open, Closed, Filled)
+              | organisation_id  |
+              | created_by_user  |
+              +------------------+
+               |             |
+        n <----+             +---- 1
+        |                          |
+        |                          v
++-------------------+     +--------------------+
+|    Application    |     | SuccessfulApplicant|
++-------------------+     +--------------------+
+| id                |     | opportunity_id     |
+| user_id           |     | user_id            |
+| opportunity_id    |     +--------------------+
+| created_at        |         (1:1 with Opportunity)
++-------------------+
+
+         ^
+         |
+         | 1
++---------------------+
+|      Profile        |
++---------------------+
+| id                  |
+| user_id             |
+| bio, skills, etc.   |
++---------------------+
+```
+
+---
+
+### 🚫 Out of Scope for MVP
+
+| Feature                          | Status     |
+|----------------------------------|------------|
+| Organisation creation            | ❌ Excluded (hardcoded only) |
+| Messaging between users          | ❌ Excluded |
+| Notifications (email/SMS/in-app) | ❌ Excluded |
+| Date scheduling                  | ❌ Excluded |
+| Rejecting applicants manually    | ❌ Excluded |
+| Withdrawing an application       | ❌ Excluded |
+
+---
+
+### 📌 Status Definitions
+
+| Opportunity Status | Description                             |
+|--------------------|-----------------------------------------|
+| **Open**           | Accepting applications                  |
+| **Closed**         | Manually closed, no new applications    |
+| **Filled**         | An applicant has been selected          |
+
+---
+
+Would you like this exported as a downloadable PDF or editable document? I can do that next.
