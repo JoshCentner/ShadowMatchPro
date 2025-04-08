@@ -30,11 +30,9 @@ export default function Header() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <a className="flex items-center">
-                  <Users className="h-8 w-8 text-primary" />
-                  <span className="ml-2 text-xl font-semibold text-gray-900">Shadow App</span>
-                </a>
+              <Link href="/" className="flex items-center">
+                <Users className="h-8 w-8 text-primary" />
+                <span className="ml-2 text-xl font-semibold text-gray-900">Shadow App</span>
               </Link>
             </div>
           </div>
@@ -62,19 +60,13 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">
-                      <a className="w-full">Profile</a>
-                    </Link>
+                    <Link href="/profile" className="w-full">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/applications">
-                      <a className="w-full">Your Applications</a>
-                    </Link>
+                    <Link href="/applications" className="w-full">Your Applications</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/your-opportunities">
-                      <a className="w-full">Your Opportunities</a>
-                    </Link>
+                    <Link href="/your-opportunities" className="w-full">Your Opportunities</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
@@ -86,9 +78,7 @@ export default function Header() {
           ) : (
             <div className="flex items-center">
               <Button asChild>
-                <Link href="/auth">
-                  <a>Sign in</a>
-                </Link>
+                <Link href="/auth">Sign in</Link>
               </Button>
             </div>
           )}

@@ -268,7 +268,7 @@ export default function CreateOpportunity() {
                       <FormItem>
                         <FormLabel>Host Details</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. Jenny McClane, 10+ years exp" {...field} />
+                          <Input placeholder="e.g. Jenny McClane, 10+ years exp" onChange={field.onChange} onBlur={field.onBlur} name={field.name} ref={field.ref} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -296,9 +296,7 @@ export default function CreateOpportunity() {
 
                   <div className="flex justify-end space-x-3">
                     <Button type="button" variant="outline" asChild>
-                      <Link href="/">
-                        <a>Cancel</a>
-                      </Link>
+                      <Link href="/">Cancel</Link>
                     </Button>
                     <Button type="submit">
                       {isEditing ? 'Update Opportunity' : 'Create Opportunity'}
