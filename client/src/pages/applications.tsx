@@ -100,14 +100,11 @@ export default function Applications() {
                 <p className="text-gray-500 mb-6">
                   You haven't applied to any shadowing opportunities yet.
                 </p>
-                <Button asChild>
-                  <Link href="/">
-                    <a className="inline-flex items-center">
-                      <Plus className="-ml-1 mr-2 h-5 w-5" />
-                      Browse Opportunities
-                    </a>
-                  </Link>
-                </Button>
+                <Link href="/">
+                  <a className="text-primary hover:text-primary/80">
+                    Browse Opportunities
+                  </a>
+                </Link>
               </CardContent>
             </Card>
           )}
