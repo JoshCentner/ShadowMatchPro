@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,10 +10,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/lib/auth';
 import { useOrganisations } from '@/lib/organisations';
 import { User } from '@shared/schema';
+import { uploadProfileImage } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
+import { ImagePlus, Loader2 } from 'lucide-react';
 
 // Profile form validation schema
 const profileSchema = z.object({
@@ -27,6 +30,9 @@ export default function Profile() {
   const { user, updateProfile, isLoading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const { data: organisations, isLoading: orgsLoading } = useOrganisations();
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Set up form with react-hook-form
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -71,6 +77,63 @@ export default function Profile() {
       .join('')
       .toUpperCase();
   };
+  
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user || !e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    
+    // Validate file type and size
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validImageTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file",
+        description: "Please upload a valid image file (JPEG, PNG, GIF, or WebP).",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // 5MB limit
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File too large",
+        description: "Image must be less than 5MB in size.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsUploading(true);
+      
+      // Upload image to Supabase
+      const publicUrl = await uploadProfileImage(file, user.id);
+      
+      // Update user profile with new image URL
+      await updateProfile({ pictureUrl: publicUrl });
+      
+      toast({
+        title: "Profile picture updated",
+        description: "Your profile picture has been successfully updated.",
+      });
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      toast({
+        title: "Upload failed",
+        description: "Could not upload your profile picture. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   if (authLoading || !user) {
     return <div>Loading...</div>;
@@ -89,15 +152,40 @@ export default function Profile() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div className="flex items-center">
-                <Avatar className="h-16 w-16">
-                  {user.pictureUrl ? (
-                    <img src={user.pictureUrl} alt={user.name} />
-                  ) : (
-                    <AvatarFallback className="bg-gray-200 text-gray-500 text-xl">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <div className="relative group">
+                  <Avatar className="h-16 w-16 relative">
+                    {user.pictureUrl ? (
+                      <AvatarImage src={user.pictureUrl} alt={user.name} />
+                    ) : (
+                      <AvatarFallback className="bg-gray-200 text-gray-500 text-xl">
+                        {getInitials(user.name)}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  
+                  <button 
+                    type="button"
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-5 w-5 text-white animate-spin" />
+                    ) : (
+                      <ImagePlus className="h-5 w-5 text-white" />
+                    )}
+                  </button>
+                  
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handleProfileImageUpload}
+                    disabled={isUploading}
+                  />
+                </div>
+                
                 <div className="ml-4">
                   <CardTitle className="text-xl">{user.name}</CardTitle>
                   <p className="text-sm text-gray-500">

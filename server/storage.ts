@@ -97,27 +97,30 @@ export class DatabaseStorage implements IStorage {
 
   // Opportunity operations
   async getOpportunities(filters?: { organisationId?: number, status?: string, format?: string }): Promise<OpportunityWithDetails[]> {
-    let query = db.select().from(opportunities);
+    // For now, just get all opportunities and filter in memory
+    // This avoids TypeScript errors with complex where clauses
+    const allOpps = await db
+      .select()
+      .from(opportunities)
+      .orderBy(desc(opportunities.createdAt));
     
-    // Apply filters
+    // Apply filters in memory if needed
+    let opps = allOpps;
     if (filters) {
-      let conditions = [];
-      if (filters.organisationId) {
-        conditions.push(eq(opportunities.organisationId, filters.organisationId));
-      }
-      if (filters.status) {
-        conditions.push(eq(opportunities.status, filters.status as any));
-      }
-      if (filters.format) {
-        conditions.push(eq(opportunities.format, filters.format as any));
-      }
-      
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
+      opps = allOpps.filter(opp => {
+        let match = true;
+        if (filters.organisationId !== undefined) {
+          match = match && opp.organisationId === filters.organisationId;
+        }
+        if (filters.status !== undefined) {
+          match = match && opp.status === filters.status;
+        }
+        if (filters.format !== undefined) {
+          match = match && opp.format === filters.format;
+        }
+        return match;
+      });
     }
-    
-    const opps = await query.orderBy(desc(opportunities.createdAt));
     
     // Enhance with details
     return await Promise.all(opps.map(async (opp) => {

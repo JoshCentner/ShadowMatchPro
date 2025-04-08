@@ -14,6 +14,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const apiRouter = Router();
   app.use("/api", apiRouter);
 
+  // Expose environment variables to the client
+  app.get("/api/config", (_req: Request, res: Response) => {
+    res.json({
+      supabaseUrl: process.env.SUPABASE_URL || '',
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
+    });
+  });
+
   // =====================
   // AUTH ROUTES
   // =====================

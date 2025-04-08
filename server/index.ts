@@ -39,8 +39,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // We're using Drizzle for database migrations now, so we don't need to use Supabase directly
-  // await testSupabaseConnection();
+  // Initialize Supabase for storage
+  await testSupabaseConnection();
+  
+  // We're using Drizzle for database operations now instead of Supabase
   // await migrateDatabase();
   // await seedDatabase();
   
