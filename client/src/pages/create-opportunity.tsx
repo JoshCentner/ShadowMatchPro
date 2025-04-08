@@ -316,11 +316,12 @@ export default function CreateOpportunity() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>What you will do/learn</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Add some details about what the shadowing experience will involve..."
-                            rows={3}
+                            placeholder="Describe in detail what the participant will do and learn during this shadowing experience..."
+                            rows={6}
+                            className="min-h-[150px]"
                             {...field}
                           />
                         </FormControl>
