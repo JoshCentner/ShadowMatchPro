@@ -145,7 +145,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('API /users/:id PUT - User ID:', userId);
     
     try {
-      const userData = insertUserSchema.partial().parse(req.body);
+      const userData = {
+        name: req.body.name,
+        organisationId: req.body.organisationId,
+        currentRole: req.body.currentRole,
+        lookingFor: req.body.lookingFor
+      };
       console.log('API /users/:id PUT - Validated data:', userData);
       const updatedUser = await storage.updateUser(userId, userData);
       

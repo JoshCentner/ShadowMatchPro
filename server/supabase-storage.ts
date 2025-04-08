@@ -104,6 +104,8 @@ export class SupabaseStorage implements IStorage {
     if (userData.pictureUrl !== undefined) dbData.picture_url = userData.pictureUrl;
     if (userData.name !== undefined) dbData.name = userData.name;
     if (userData.organisationId !== undefined) dbData.organisation_id = userData.organisationId;
+
+    console.log('Storage - Transformed data for DB:', dbData);
     
     console.log('Storage - Transformed data for DB:', dbData);
     
