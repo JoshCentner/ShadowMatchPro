@@ -120,6 +120,7 @@ export default function CreateOpportunity() {
         // Update existing opportunity
         const updatedOpportunity = await apiRequest("PUT", `/api/opportunities/${opportunityId}`, {
           ...data,
+          id: opportunityId,
           createdByUserId: user.id
         });
 
