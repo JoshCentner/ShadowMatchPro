@@ -229,15 +229,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(true);
       
       // Redirect to Google OAuth
-      // Store the current path (without domain) to return to after auth
-      const returnPath = window.location.pathname + window.location.search;
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            returnTo: returnPath
+            returnTo: window.location.href
           }
         },
       });
