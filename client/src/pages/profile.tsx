@@ -21,7 +21,7 @@ import { ImagePlus, Loader2 } from 'lucide-react';
 // Profile form validation schema
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  organisationId: z.number().positive('Please select an organisation'),
+  organisationId: z.number().positive('Please select an organisation').optional(),
   currentRole: z.string().optional(),
   lookingFor: z.string().optional(),
 });
