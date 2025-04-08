@@ -313,6 +313,7 @@ export default function CreateOpportunity() {
                               placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale, and innovation within constraints."
                               rows={4}
                               maxLength={280}
+                              className="min-h-[100px]"
                               {...field}
                             />
                             <div className="text-xs text-muted-foreground text-right">
@@ -339,6 +340,7 @@ export default function CreateOpportunity() {
                               - Cross team collaboration"
                               rows={4}
                               maxLength={280}
+                              className="min-h-[100px]"
                               {...field}
                             />
                             <div className="text-xs text-muted-foreground text-right">
