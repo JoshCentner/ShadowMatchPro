@@ -268,7 +268,7 @@ export default function CreateOpportunity() {
                       <FormItem>
                         <FormLabel>Host Details</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. Jenny McClane, 10+ years exp" onChange={field.onChange} onBlur={field.onBlur} name={field.name} ref={field.ref} value={field.value ?? ''} />
+                          <Textarea placeholder="10+ years exp in Fintech. Experienced with large orgs, agile at scale and innovations within constraints." onChange={field.onChange} onBlur={field.onBlur} name={field.name} ref={field.ref} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -280,10 +280,10 @@ export default function CreateOpportunity() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>What you will do/learn</FormLabel>
+                        <FormLabel>What will they learn?</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Describe in detail what the participant will do and learn during this shadowing experience..."
+                            placeholder="Describe in dot points what the student will learn"
                             rows={6}
                             className="min-h-[150px]"
                             {...field}
