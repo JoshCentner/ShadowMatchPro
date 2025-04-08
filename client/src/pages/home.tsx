@@ -1,0 +1,115 @@
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import NavigationTabs from '@/components/navigation-tabs';
+import OpportunityCard from '@/components/opportunity-card';
+import OpportunityFilters from '@/components/opportunity-filters';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { OpportunityWithDetails } from '@shared/schema';
+import { useAuth } from '@/lib/auth';
+import { Plus } from 'lucide-react';
+
+export default function Home() {
+  const [filters, setFilters] = useState<{
+    organisationId?: number;
+    format?: string;
+    status?: string;
+  }>({});
+  
+  const [, navigate] = useLocation();
+  const { user } = useAuth();
+
+  // Construct the query string for filtered opportunities
+  const buildQueryString = () => {
+    const params = new URLSearchParams();
+    
+    if (filters.organisationId) {
+      params.append('organisationId', filters.organisationId.toString());
+    }
+    
+    if (filters.format) {
+      params.append('format', filters.format);
+    }
+    
+    if (filters.status) {
+      params.append('status', filters.status);
+    }
+    
+    const queryString = params.toString();
+    return queryString ? `?${queryString}` : '';
+  };
+
+  const { data: opportunities, isLoading, error } = useQuery<OpportunityWithDetails[]>({
+    queryKey: [`/api/opportunities${buildQueryString()}`],
+  });
+
+  return (
+    <>
+      <NavigationTabs />
+      
+      <main className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-semibold text-gray-900">Shadowing Opportunities</h1>
+              
+              {user && (
+                <Button onClick={() => navigate('/create-opportunity')}>
+                  <Plus className="-ml-1 mr-2 h-5 w-5" />
+                  Create Opportunity
+                </Button>
+              )}
+            </div>
+            
+            <OpportunityFilters onFilterChange={setFilters} />
+            
+            {isLoading ? (
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-full mt-2" />
+                    <Skeleton className="h-4 w-full mt-2" />
+                    <Skeleton className="h-4 w-3/4 mt-2" />
+                    <div className="flex justify-between mt-4">
+                      <Skeleton className="h-5 w-24" />
+                      <Skeleton className="h-5 w-24" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-10">
+                <p className="text-red-500">Error loading opportunities. Please try again later.</p>
+              </div>
+            ) : opportunities && opportunities.length > 0 ? (
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {opportunities.map((opportunity) => (
+                  <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-gray-50 rounded-lg">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
+                <p className="text-gray-500 mb-6">Try adjusting your filters or check back later for new opportunities.</p>
+                {user && (
+                  <Button onClick={() => navigate('/create-opportunity')}>
+                    <Plus className="-ml-1 mr-2 h-5 w-5" />
+                    Create New Opportunity
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
