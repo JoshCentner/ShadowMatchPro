@@ -360,7 +360,7 @@ export default function CreateOpportunity() {
                             <Textarea
                               placeholder="- Understand how product teams operate in a large org
 - Learn about agile delivery practices and ceremonies
-                              - Cross team collaboration"
+- Cross team collaboration"
                               rows={4}
                               maxLength={280}
                               className="min-h-[100px]"
