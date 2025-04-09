@@ -214,12 +214,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log('GET /api/opportunities/:id - Full DB Result:', JSON.stringify(opportunity, null, 2));
-      console.log('GET /api/opportunities/:id - Duration Value:', opportunity.durationLimit);
+      console.log('GET /api/opportunities/:id - Raw Fields:', {
+        duration_limit: opportunity.duration_limit,
+        host_details: opportunity.host_details,
+        durationLimit: opportunity.durationLimit,
+        hostDetails: opportunity.hostDetails
+      });
       console.log('GET /api/opportunities/:id - Response:', {
         id: opportunity.id,
         title: opportunity.title,
         organisation: opportunity.organisation,
-        durationLimit: opportunity.durationLimit,
+        durationLimit: opportunity.duration_limit, // Fix mapping
+        hostDetails: opportunity.host_details, // Fix mapping
         learningAreas: opportunity.learningAreas,
         applications: opportunity.applications,
         status: opportunity.status

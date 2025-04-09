@@ -20,6 +20,15 @@ export default function OpportunityDetail() {
   const { data: opportunity, isLoading, error } = useQuery<OpportunityWithDetails>({
     queryKey: [`/api/opportunities/${opportunityId}`],
     enabled: !!opportunityId,
+    onSuccess: (data) => {
+      console.log('Opportunity Detail Data:', {
+        raw: data,
+        duration: data?.duration_limit,
+        durationLimit: data?.durationLimit,
+        host: data?.host_details,
+        hostDetails: data?.hostDetails
+      });
+    }
   });
 
   // Determine if the current user is the creator
@@ -109,7 +118,7 @@ export default function OpportunityDetail() {
                   
                   <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Duration</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.durationLimit}</dd>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.duration_limit}</dd>
                   </div>
 
                   <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -119,7 +128,7 @@ export default function OpportunityDetail() {
                   
                   <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Host Details</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.hostDetails || 'No host details provided'}</dd>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.host_details || 'No host details provided'}</dd>
                   </div>
                   
                   {learningOutcomes.length > 0 && (
