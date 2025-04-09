@@ -109,7 +109,7 @@ export default function YourOpportunities() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Your Opportunities
+              My Opportunities
             </h1>
           </div>
 
