@@ -32,7 +32,7 @@ export default function Header() {
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                <span className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 truncate">Shadow App</span>
+                <span className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 truncate">Backstage</span>
               </Link>
             </div>
           </div>
