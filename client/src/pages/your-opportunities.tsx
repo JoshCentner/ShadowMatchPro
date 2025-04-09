@@ -241,6 +241,12 @@ export default function YourOpportunities() {
                               >
                                 Mark as Closed
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(opportunity.id, 'Open')}
+                                disabled={opportunity.status === 'Open'}
+                              >
+                                Mark as Open
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
