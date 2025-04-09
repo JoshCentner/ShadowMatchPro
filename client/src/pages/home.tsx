@@ -32,9 +32,8 @@ export default function Home() {
       params.append('format', filters.format);
     }
     
-    if (filters.status) {
-      params.append('status', filters.status);
-    }
+    // Always filter for Open opportunities
+    params.append('status', 'Open');
     
     const queryString = params.toString();
     return queryString ? `?${queryString}` : '';

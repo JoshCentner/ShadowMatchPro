@@ -14,7 +14,6 @@ interface OpportunityFiltersProps {
 export default function OpportunityFilters({ onFilterChange }: OpportunityFiltersProps) {
   const [selectedOrganisation, setSelectedOrganisation] = useState<string>('');
   const [selectedFormat, setSelectedFormat] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
   
   const { data: organisations, isLoading: isLoadingOrgs } = useOrganisations();
 
@@ -23,7 +22,6 @@ export default function OpportunityFilters({ onFilterChange }: OpportunityFilter
     const filters: {
       organisationId?: number;
       format?: string;
-      status?: string;
     } = {};
     
     if (selectedOrganisation && selectedOrganisation !== 'all') {
@@ -32,10 +30,6 @@ export default function OpportunityFilters({ onFilterChange }: OpportunityFilter
     
     if (selectedFormat && selectedFormat !== 'all') {
       filters.format = selectedFormat;
-    }
-    
-    if (selectedStatus && selectedStatus !== 'all') {
-      filters.status = selectedStatus;
     }
     
     onFilterChange(filters);
