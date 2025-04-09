@@ -45,6 +45,21 @@ export default function Home() {
 
   return (
     <>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {user && (
+          <div className="flex justify-end">
+            <Button 
+              onClick={() => navigate('/create-opportunity')}
+              size="lg"
+              className="shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <Plus className="-ml-1 mr-2 h-5 w-5" />
+              Create Opportunity
+            </Button>
+          </div>
+        )}
+      </div>
+
       <NavigationTabs />
       
       <main className="py-6">
@@ -52,23 +67,9 @@ export default function Home() {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-semibold text-gray-900">Shadowing Opportunities</h1>
-              
-              </div>
+            </div>
             
             <OpportunityFilters onFilterChange={setFilters} />
-
-            {user && (
-              <div className="fixed bottom-6 right-6">
-                <Button 
-                  onClick={() => navigate('/create-opportunity')}
-                  size="lg"
-                  className="shadow-lg hover:shadow-xl transition-shadow"
-                >
-                  <Plus className="-ml-1 mr-2 h-5 w-5" />
-                  Create Opportunity
-                </Button>
-              </div>
-            )}
             
             {isLoading ? (
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
