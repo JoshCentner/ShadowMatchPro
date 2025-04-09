@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 import NavigationTabs from '@/components/navigation-tabs';
 import OpportunityCard from '@/components/opportunity-card';
 import OpportunityFilters from '@/components/opportunity-filters';
@@ -65,9 +67,18 @@ export default function Home() {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-xl font-semibold text-gray-900">See how work gets done.</h1>
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    Filters
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-4">
+                  <OpportunityFilters onFilterChange={setFilters} />
+                </CollapsibleContent>
+              </Collapsible>
             </div>
-            
-            <OpportunityFilters onFilterChange={setFilters} />
             
             {isLoading ? (
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
