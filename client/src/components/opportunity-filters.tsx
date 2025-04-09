@@ -33,7 +33,7 @@ export default function OpportunityFilters({ onFilterChange }: OpportunityFilter
     }
     
     onFilterChange(filters);
-  }, [selectedOrganisation, selectedFormat, selectedStatus, onFilterChange]);
+  }, [selectedOrganisation, selectedFormat, onFilterChange]);
 
   return (
     <div className="mb-6">
