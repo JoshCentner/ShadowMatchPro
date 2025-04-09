@@ -274,8 +274,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/users/:id/opportunities", async (req: Request, res: Response) => {
     try {
       const userId = parseInt(req.params.id);
-      const opportunities = await storage.getOpportunitiesByUserId(userId, true); // Modified line
-      return res.status(200).json(opportunities);
+      const opportunities = await storage.getOpportunitiesByUserId(userId, true);
+      const withApplications = await Promise.all(
+        opportunities.map(async (opp) => {
+          const applications = await storage.getApplicationsByOpportunityId(opp.id);
+          return {
+            ...opp,
+            applications: applications || []
+          };
+        })
+      );
+      res.json(withApplications);
     } catch (error) {
       return res.status(500).json({ message: "Failed to get user opportunities" });
     }
