@@ -200,7 +200,6 @@ export default function YourOpportunities() {
                 Review and select an applicant for this shadowing opportunity.
               </DialogDescription>
             </DialogHeader>
-            
             {selectedOpportunity.applications && selectedOpportunity.applications.length > 0 ? (
               <div className="space-y-4 max-h-80 overflow-y-auto">
                 {selectedOpportunity.applications.map((application) => (
