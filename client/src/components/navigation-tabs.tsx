@@ -1,4 +1,6 @@
-import { Link, useLocation } from 'wouter';
+
+import { useLocation } from 'wouter';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface NavigationTab {
   name: string;
@@ -13,31 +15,31 @@ const tabs: NavigationTab[] = [
 ];
 
 export default function NavigationTabs() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  
+  // Get current tab value based on location
+  const getCurrentTab = () => {
+    if (location === '/') return '/';
+    return tabs.find(tab => location.startsWith(tab.href))?.href || '/';
+  };
 
   return (
-    <div className="border-b border-gray-200 w-full overflow-x-auto sticky top-0 bg-white z-10">
-      <div className="max-w-7xl mx-auto px-1 sm:px-4 lg:px-8">
-        <nav className="-mb-px flex space-x-3 sm:space-x-8 min-w-max py-1 sm:py-0" aria-label="Tabs">
-          {tabs.map((tab) => {
-            const isActive = 
-              tab.href === '/' ? location === '/' : location.startsWith(tab.href);
-            
-            return (
-              <Link href={tab.href} key={tab.name}>
-                <a
-                  className={`${isActive 
-                    ? 'border-primary text-primary' 
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } border-b-2 whitespace-nowrap py-4 px-1 font-medium text-sm`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {tab.name}
-                </a>
-              </Link>
-            );
-          })}
-        </nav>
+    <div className="border-b border-gray-200 w-full sticky top-0 bg-white z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Tabs value={getCurrentTab()} className="w-full">
+          <TabsList className="h-14 w-full justify-start bg-transparent border-0">
+            {tabs.map((tab) => (
+              <TabsTrigger
+                key={tab.name}
+                value={tab.href}
+                onClick={() => setLocation(tab.href)}
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 sm:px-4"
+              >
+                {tab.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );
