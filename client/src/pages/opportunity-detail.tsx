@@ -35,7 +35,7 @@ export default function OpportunityDetail() {
   const isCreator = user && opportunity && user.id === opportunity.createdByUserId;
   
   // Determine if the user has already applied
-  const hasApplied = user && opportunity?.applications?.some(app => app.userId === user.id);
+  const hasApplied = user && opportunity?.applications?.some(app => app.user_id === user.id);
   
   // Format the learning outcomes as an array
   const learningOutcomes = opportunity?.learningAreas.map(area => area.name) || [];
