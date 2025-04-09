@@ -73,23 +73,6 @@ export default function OpportunityFilters({ onFilterChange }: OpportunityFilter
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="w-full sm:w-1/3">
-          <Select
-            value={selectedStatus}
-            onValueChange={setSelectedStatus}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Open">Open</SelectItem>
-              <SelectItem value="Closed">Closed</SelectItem>
-              <SelectItem value="Filled">Filled</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
     </div>
   );
