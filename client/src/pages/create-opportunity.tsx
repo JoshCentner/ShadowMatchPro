@@ -63,16 +63,13 @@ export default function CreateOpportunity() {
   // Fetch organisations
   const { data: organisations, isLoading: isLoadingOrgs } = useOrganisations();
 
-  // Fetch learning areas
-  const { data: learningAreas, isLoading: isLoadingAreas } = useQuery({
-    queryKey: ["/api/learning-areas"],
-  });
-
   // Fetch opportunity if editing
   const { data: opportunity, isLoading: isLoadingOpportunity } = useQuery({
     queryKey: [`/api/opportunities/${opportunityId}`],
     enabled: !!opportunityId,
   });
+  
+  console.log(opportunity);
 
   // Set up form with react-hook-form
   const form = useForm<z.infer<typeof createOpportunitySchema>>({
@@ -92,7 +89,12 @@ export default function CreateOpportunity() {
 
   // Set form values when editing and data is loaded
   useEffect(() => {
-    if (opportunityId && opportunity && !isLoadingOpportunity && !isLoadingOrgs) {
+    if (
+      opportunityId &&
+      opportunity &&
+      !isLoadingOpportunity &&
+      !isLoadingOrgs
+    ) {
       setIsEditing(true);
 
       // Set form values
@@ -103,7 +105,14 @@ export default function CreateOpportunity() {
         learningAreaIds: [],
       });
     }
-  }, [opportunity, opportunityId, isLoadingOpportunity, isLoadingOrgs, form, user?.organisationId]);
+  }, [
+    opportunity,
+    opportunityId,
+    isLoadingOpportunity,
+    isLoadingOrgs,
+    form,
+    user?.organisationId,
+  ]);
 
   // Handle form submission
   const onSubmit = async (data: z.infer<typeof createOpportunitySchema>) => {
@@ -119,11 +128,15 @@ export default function CreateOpportunity() {
     try {
       if (isEditing && opportunityId) {
         // Update existing opportunity
-        const updatedOpportunity = await apiRequest("PUT", `/api/opportunities/${opportunityId}`, {
-          ...data,
-          id: opportunityId,
-          createdByUserId: user.id
-        });
+        const updatedOpportunity = await apiRequest(
+          "PUT",
+          `/api/opportunities/${opportunityId}`,
+          {
+            ...data,
+            id: opportunityId,
+            createdByUserId: user.id,
+          },
+        );
 
         if (!updatedOpportunity) {
           throw new Error("Failed to update opportunity");
