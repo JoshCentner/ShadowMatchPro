@@ -31,10 +31,8 @@ export default function Header() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
-                <svg className="h-6 w-6 sm:h-8 sm:w-8 text-primary" viewBox="0 0 100 100" fill="currentColor">
-                  <path d="M50 10 C20 10 10 30 10 50 C10 70 30 90 50 90 C70 90 90 70 90 50 C90 30 80 10 50 10 M30 40 L30 60 L70 60 L70 40 L50 20 L30 40" />
-                </svg>
-                <span className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 truncate">Backstage</span>
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                <span className="ml-2 text-lg sm:text-xl font-semibold text-gray-900 truncate">Shadow App</span>
               </Link>
             </div>
           </div>
