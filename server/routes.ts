@@ -248,11 +248,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const opportunityId = parseInt(req.params.id);
       const opportunityData = insertOpportunitySchema.partial().parse(req.body);
 
-      // Ensure host details and organisation ID are included in update
+      // Allow status updates
       const updateData = {
         ...opportunityData,
         host_details: opportunityData.hostDetails,
-        organisation_id: opportunityData.organisationId
+        organisation_id: opportunityData.organisationId,
+        status: opportunityData.status
       };
 
       const updatedOpportunity = await storage.updateOpportunity(opportunityId, updateData);

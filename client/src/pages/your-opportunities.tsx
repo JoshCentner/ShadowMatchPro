@@ -39,6 +39,28 @@ export default function YourOpportunities() {
     useState<OpportunityWithDetails | null>(null);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleStatusChange = async (opportunityId: number, status: 'Filled' | 'Closed') => {
+    try {
+      await apiRequest('PUT', `/api/opportunities/${opportunityId}`, { status });
+      
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${user?.id}/opportunities`] });
+      
+      toast({
+        title: 'Status updated',
+        description: `Opportunity marked as ${status}`,
+      });
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast({
+        title: 'Update failed',
+        description: 'Failed to update opportunity status',
+        variant: 'destructive',
+      });
+    }
+  };
 
   // Redirect if not logged in
   useEffect(() => {
@@ -204,6 +226,19 @@ export default function YourOpportunities() {
                               >
                                 <Users className="mr-2 h-4 w-4" />
                                 View Applications
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(opportunity.id, 'Filled')}
+                                disabled={opportunity.status === 'Filled'}
+                              >
+                                Mark as Filled
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(opportunity.id, 'Closed')}
+                                disabled={opportunity.status === 'Closed'}
+                              >
+                                Mark as Closed
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
