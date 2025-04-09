@@ -35,9 +35,28 @@ export default function OpportunityDetail() {
   const isCreator = user && opportunity && user.id === opportunity.createdByUserId;
   
   // Determine if the user has already applied
-  const hasApplied = user && opportunity?.applications?.some(app => {
-    return app.userId === user.id || app.user_id === user.id;
+  console.log('Checking hasApplied:', {
+    user: user?.id,
+    applications: opportunity?.applications,
+    applicationUserIds: opportunity?.applications?.map(app => ({ 
+      userId: app.userId, 
+      user_id: app.user_id 
+    }))
   });
+  
+  const hasApplied = user && opportunity?.applications?.some(app => {
+    const matches = app.userId === user.id || app.user_id === user.id;
+    console.log('Application check:', {
+      applicationId: app.id,
+      applicationUserId: app.userId,
+      application_user_id: app.user_id,
+      currentUserId: user.id,
+      matches
+    });
+    return matches;
+  });
+
+  console.log('Final hasApplied value:', hasApplied);
   
   // Format the learning outcomes as an array
   const learningOutcomes = opportunity?.learningAreas.map(area => area.name) || [];
