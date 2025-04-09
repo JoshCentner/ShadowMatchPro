@@ -76,7 +76,7 @@ export default function Applications() {
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{application.opportunity.title}</div>
                             <div className="text-sm text-gray-500">
-                              Applied on {format(new Date(application.createdAt), 'MMMM d, yyyy')}
+                              Applied on {application.createdAt ? format(new Date(application.createdAt), 'MMMM d, yyyy') : 'Unknown date'}
                             </div>
                           </div>
                         </div>
