@@ -72,9 +72,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    // Handle pictureUrl separately since it's not in InsertUser type
+    const { pictureUrl, ...rest } = userData as any;
+    const updateData = {
+      ...rest,
+      picture_url: pictureUrl // Map to correct column name
+    };
+    
     const [updatedUser] = await db
       .update(users)
-      .set(userData)
+      .set(updateData)
       .where(eq(users.id, id))
       .returning();
     return updatedUser;
