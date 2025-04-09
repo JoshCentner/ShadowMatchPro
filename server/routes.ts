@@ -203,16 +203,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get opportunity by ID
   apiRouter.get("/opportunities/:id", async (req: Request, res: Response) => {
+    console.log('GET /api/opportunities/:id - Request:', req.params);
     try {
       const opportunityId = parseInt(req.params.id);
       const opportunity = await storage.getOpportunityById(opportunityId);
       
       if (!opportunity) {
+        console.log('GET /api/opportunities/:id - Opportunity not found:', opportunityId);
         return res.status(404).json({ message: "Opportunity not found" });
       }
       
+      console.log('GET /api/opportunities/:id - DB Result:', opportunity);
+      console.log('GET /api/opportunities/:id - Response:', {
+        id: opportunity.id,
+        title: opportunity.title,
+        organisation: opportunity.organisation,
+        learningAreas: opportunity.learningAreas,
+        applications: opportunity.applications,
+        status: opportunity.status
+      });
+      
       return res.status(200).json(opportunity);
     } catch (error) {
+      console.error('GET /api/opportunities/:id - Error:', error);
       return res.status(500).json({ message: "Failed to get opportunity" });
     }
   });
