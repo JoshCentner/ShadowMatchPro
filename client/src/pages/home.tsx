@@ -46,7 +46,7 @@ export default function Home() {
   return (
     <>
       {user && (
-        <div className="fixed bottom-6 right-6 z-10">
+        <div className="fixed bottom-[74px] right-6 z-10">
           <Button
             onClick={() => navigate('/create-opportunity')}
             size="icon"
