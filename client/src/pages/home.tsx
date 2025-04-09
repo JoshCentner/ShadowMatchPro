@@ -65,19 +65,21 @@ export default function Home() {
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-xl font-semibold text-gray-900">See how work gets done.</h1>
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    Filters
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4">
-                  <OpportunityFilters onFilterChange={setFilters} />
-                </CollapsibleContent>
-              </Collapsible>
+            <div className="sticky top-0 bg-white z-10 py-4 border-b">
+              <div className="flex justify-between items-center">
+                <h1 className="text-xl font-semibold text-gray-900">See how work gets done.</h1>
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Filters
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="absolute right-0 mt-2 w-full md:w-96 bg-white p-4 rounded-lg shadow-lg border">
+                    <OpportunityFilters onFilterChange={setFilters} />
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
             </div>
             
             {isLoading ? (
