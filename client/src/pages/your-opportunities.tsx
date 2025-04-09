@@ -203,23 +203,42 @@ export default function YourOpportunities() {
             {selectedOpportunity.applications && selectedOpportunity.applications.length > 0 ? (
               <div className="space-y-4 max-h-80 overflow-y-auto">
                 {selectedOpportunity.applications.map((application) => (
-                  <div key={application.id} className="border rounded-md p-4">
+                  <div key={application.id} className="border rounded-md p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                          <span className="font-medium text-gray-500">
-                            {application.user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                          </span>
+                      <div className="flex items-center space-x-3">
+                        <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {application.user.pictureUrl ? (
+                            <img 
+                              src={application.user.pictureUrl} 
+                              alt={application.user.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="font-medium text-gray-500 text-lg">
+                              {application.user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </span>
+                          )}
                         </div>
-                        <div className="ml-3">
-                          <h4 className="text-sm font-medium">{application.user.name}</h4>
-                          <p className="text-sm text-gray-500">{application.user.currentRole || 'No role specified'}</p>
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900">{application.user.name}</h4>
+                          <div className="flex items-center mt-1">
+                            {application.user.currentRole && (
+                              <p className="text-sm text-gray-500">{application.user.currentRole}</p>
+                            )}
+                            {application.user.organisationId && application.user.organisation && (
+                              <>
+                                <span className="mx-2 text-gray-300">•</span>
+                                <p className="text-sm text-gray-500">{application.user.organisation.name}</p>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                       {selectedOpportunity.status === 'Open' && (
                         <Button 
                           size="sm"
                           onClick={() => handleAcceptApplication(application)}
+                          className="flex-shrink-0"
                         >
                           Accept
                         </Button>
@@ -227,8 +246,14 @@ export default function YourOpportunities() {
                     </div>
                     
                     {application.message && (
-                      <div className="mt-2 text-sm bg-gray-50 p-3 rounded">
-                        <p className="text-gray-700">{application.message}</p>
+                      <div className="mt-3 text-sm bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <p className="text-gray-700 whitespace-pre-wrap">{application.message}</p>
+                      </div>
+                    )}
+                    
+                    {application.createdAt && (
+                      <div className="mt-3 text-xs text-gray-500">
+                        Applied {format(new Date(application.createdAt), 'MMMM d, yyyy')}
                       </div>
                     )}
                   </div>
