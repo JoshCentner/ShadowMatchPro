@@ -13,6 +13,7 @@ export const organisations = pgTable("organisations", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
   shortCode: varchar("short_code", { length: 10 }).notNull(),
+  logo_url: text("logo_url"), // Added logo_url column
 });
 
 // Users table
@@ -147,7 +148,7 @@ export const insertLearningAreaSchema = createInsertSchema(learningAreas).omit({
 export const insertOpportunityLearningAreaSchema = createInsertSchema(opportunityLearningAreas);
 
 // Types
-export type Organisation = typeof organisations.$inferSelect;
+export type Organisation = typeof organisations.$inferSelect & { logo_url: string | null }; // Modified to include logo_url
 export type InsertOrganisation = z.infer<typeof insertOrganisationSchema>;
 
 export type User = typeof users.$inferSelect;

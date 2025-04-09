@@ -26,9 +26,17 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
       <div className="px-4 py-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <div className={`h-10 w-10 rounded-full ${getOrganisationColor(opportunity.organisation.shortCode)} flex items-center justify-center`}>
-              <span className="text-xs font-medium">{opportunity.organisation.shortCode}</span>
-            </div>
+            {opportunity.organisation.logo_url ? (
+              <img 
+                src={opportunity.organisation.logo_url} 
+                alt={`${opportunity.organisation.name} logo`}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className={`h-10 w-10 rounded-full ${getOrganisationColor(opportunity.organisation.shortCode)} flex items-center justify-center`}>
+                <span className="text-xs font-medium">{opportunity.organisation.shortCode}</span>
+              </div>
+            )}
             <div className="ml-3">
               <h3 className="text-lg font-medium text-gray-900">{opportunity.title}</h3>
               <p className="text-sm text-gray-500">{opportunity.durationLimit}</p>
