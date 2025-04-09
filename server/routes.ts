@@ -3,22 +3,25 @@ import { createServer, type Server } from "http";
 import { storage } from "./supabase-storage";
 import { z } from "zod";
 import { db } from "./db";
-import { 
-  insertUserSchema, 
-  insertOpportunitySchema, 
-  insertApplicationSchema, 
-  insertSuccessfulApplicationSchema
+import {
+  insertUserSchema,
+  insertOpportunitySchema,
+  insertApplicationSchema,
+  insertSuccessfulApplicationSchema,
 } from "@shared/schema";
 
-const handleDbOperation = async (operation: () => Promise<any>, fallback: any) => {
+const handleDbOperation = async (
+  operation: () => Promise<any>,
+  fallback: any,
+) => {
   if (!db) {
-    console.warn('Database operation attempted but database is not connected');
+    console.warn("Database operation attempted but database is not connected");
     return fallback;
   }
   try {
     return await operation();
   } catch (error) {
-    console.error('Database operation failed:', error);
+    console.error("Database operation failed:", error);
     return fallback;
   }
 };
@@ -31,8 +34,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Expose environment variables to the client
   app.get("/api/config", (_req: Request, res: Response) => {
     res.json({
-      supabaseUrl: process.env.SUPABASE_URL || '',
-      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
+      supabaseUrl: process.env.SUPABASE_URL || "",
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
     });
   });
 
@@ -54,7 +57,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(201).json(newUser);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid user data", errors: error.errors });
+        return res
+          .status(400)
+          .json({ message: "Invalid user data", errors: error.errors });
       }
       return res.status(500).json({ message: "Failed to register user" });
     }
@@ -66,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email, name, pictureUrl } = req.body;
 
       if (!email || !name) {
-        return res.status(400).json({ message: 'Email and name are required' });
+        return res.status(400).json({ message: "Email and name are required" });
       }
 
       // Check if user already exists
@@ -74,9 +79,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (user) {
         // If user exists, update their profile if needed
-        const needsUpdate = 
-          (pictureUrl && user.pictureUrl !== pictureUrl) || 
-          (user.name !== name);
+        const needsUpdate =
+          (pictureUrl && user.pictureUrl !== pictureUrl) || user.name !== name;
 
         if (needsUpdate) {
           const updateData: Partial<typeof user> = {};
@@ -108,12 +112,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const newUser = await storage.createUser(userData);
         res.json(newUser);
       } catch (error: any) {
-        console.error('Error creating user:', error);
-        res.status(500).json({ message: 'Failed to create user account' });
+        console.error("Error creating user:", error);
+        res.status(500).json({ message: "Failed to create user account" });
       }
     } catch (error: any) {
-      console.error('Error in Google sign-in:', error);
-      res.status(500).json({ message: 'Failed to authenticate with Google' });
+      console.error("Error in Google sign-in:", error);
+      res.status(500).json({ message: "Failed to authenticate with Google" });
     }
   });
 
@@ -141,17 +145,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile
   apiRouter.put("/users/:id", async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id);
-    console.log('API /users/:id PUT - Request body:', req.body);
-    console.log('API /users/:id PUT - User ID:', userId);
+    console.log("API /users/:id PUT - Request body:", req.body);
+    console.log("API /users/:id PUT - User ID:", userId);
 
     try {
       const userData = {
         name: req.body.name,
         organisationId: req.body.organisationId,
         currentRole: req.body.currentRole,
-        lookingFor: req.body.lookingFor
+        lookingFor: req.body.lookingFor,
       };
-      console.log('API /users/:id PUT - Validated data:', userData);
+      console.log("API /users/:id PUT - Validated data:", userData);
       const updatedUser = await storage.updateUser(userId, userData);
 
       if (!updatedUser) {
@@ -161,7 +165,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(200).json(updatedUser);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid user data", errors: error.errors });
+        return res
+          .status(400)
+          .json({ message: "Invalid user data", errors: error.errors });
       }
       return res.status(500).json({ message: "Failed to update user" });
     }
@@ -189,9 +195,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/opportunities", async (req: Request, res: Response) => {
     try {
       const filters = {
-        organisationId: req.query.organisationId ? parseInt(req.query.organisationId as string) : undefined,
+        organisationId: req.query.organisationId
+          ? parseInt(req.query.organisationId as string)
+          : undefined,
         status: req.query.status as string | undefined,
-        format: req.query.format as string | undefined
+        format: req.query.format as string | undefined,
       };
 
       const opportunities = await storage.getOpportunities(filters);
@@ -203,16 +211,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get opportunity by ID
   apiRouter.get("/opportunities/:id", async (req: Request, res: Response) => {
+    console.log("GET /api/opportunities/:id - Request:", req.params);
     try {
       const opportunityId = parseInt(req.params.id);
       const opportunity = await storage.getOpportunityById(opportunityId);
 
       if (!opportunity) {
+        console.log(
+          "GET /api/opportunities/:id - Opportunity not found:",
+          opportunityId,
+        );
         return res.status(404).json({ message: "Opportunity not found" });
       }
 
       return res.status(200).json(opportunity);
     } catch (error) {
+      console.error("GET /api/opportunities/:id - Error:", error);
       return res.status(500).json({ message: "Failed to get opportunity" });
     }
   });
@@ -228,7 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const areaId of req.body.learningAreaIds) {
           await storage.addLearningAreaToOpportunity({
             opportunityId: newOpportunity.id,
-            learningAreaId: areaId
+            learningAreaId: areaId,
           });
         }
       }
@@ -236,7 +250,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(201).json(newOpportunity);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid opportunity data", errors: error.errors });
+        return res
+          .status(400)
+          .json({ message: "Invalid opportunity data", errors: error.errors });
       }
       return res.status(500).json({ message: "Failed to create opportunity" });
     }
@@ -253,10 +269,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...opportunityData,
         host_details: opportunityData.hostDetails,
         organisation_id: opportunityData.organisationId,
-        status: opportunityData.status
+        status: opportunityData.status,
       };
 
-      const updatedOpportunity = await storage.updateOpportunity(opportunityId, updateData);
+      const updatedOpportunity = await storage.updateOpportunity(
+        opportunityId,
+        updateData,
+      );
 
       if (!updatedOpportunity) {
         return res.status(404).json({ message: "Opportunity not found" });
@@ -265,57 +284,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(200).json(updatedOpportunity);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid opportunity data", errors: error.errors });
+        return res
+          .status(400)
+          .json({ message: "Invalid opportunity data", errors: error.errors });
       }
       return res.status(500).json({ message: "Failed to update opportunity" });
     }
   });
 
   // Get opportunities created by user
-  apiRouter.get("/users/:id/opportunities", async (req: Request, res: Response) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const opportunities = await storage.getOpportunitiesByUserId(userId, true);
-      const withApplications = await Promise.all(
-        opportunities.map(async (opp) => {
-          const applications = await storage.getApplicationsByOpportunityId(opp.id);
-          return {
-            ...opp,
-            applications: applications || []
-          };
-        })
-      );
-      res.json(withApplications);
-    } catch (error) {
-      return res.status(500).json({ message: "Failed to get user opportunities" });
-    }
-  });
+  apiRouter.get(
+    "/users/:id/opportunities",
+    async (req: Request, res: Response) => {
+      try {
+        const userId = parseInt(req.params.id);
+        const opportunities = await storage.getOpportunitiesByUserId(
+          userId,
+          true,
+        );
+        const withApplications = await Promise.all(
+          opportunities.map(async (opp) => {
+            const applications = await storage.getApplicationsByOpportunityId(
+              opp.id,
+            );
+            return {
+              ...opp,
+              applications: applications || [],
+            };
+          }),
+        );
+        res.json(withApplications);
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Failed to get user opportunities" });
+      }
+    },
+  );
 
   // =====================
   // APPLICATION ROUTES
   // =====================
 
   // Get applications for an opportunity
-  apiRouter.get("/opportunities/:id/applications", async (req: Request, res: Response) => {
-    try {
-      const opportunityId = parseInt(req.params.id);
-      const applications = await storage.getApplicationsByOpportunityId(opportunityId);
-      return res.status(200).json(applications);
-    } catch (error) {
-      return res.status(500).json({ message: "Failed to get applications" });
-    }
-  });
+  apiRouter.get(
+    "/opportunities/:id/applications",
+    async (req: Request, res: Response) => {
+      try {
+        const opportunityId = parseInt(req.params.id);
+        const applications =
+          await storage.getApplicationsByOpportunityId(opportunityId);
+        return res.status(200).json(applications);
+      } catch (error) {
+        return res.status(500).json({ message: "Failed to get applications" });
+      }
+    },
+  );
 
   // Get applications made by a user
-  apiRouter.get("/users/:id/applications", async (req: Request, res: Response) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const applications = await storage.getApplicationsByUserId(userId);
-      return res.status(200).json(applications);
-    } catch (error) {
-      return res.status(500).json({ message: "Failed to get user applications" });
-    }
-  });
+  apiRouter.get(
+    "/users/:id/applications",
+    async (req: Request, res: Response) => {
+      try {
+        const userId = parseInt(req.params.id);
+        const applications = await storage.getApplicationsByUserId(userId);
+        return res.status(200).json(applications);
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Failed to get user applications" });
+      }
+    },
+  );
 
   // Create application
   apiRouter.post("/applications", async (req: Request, res: Response) => {
@@ -323,62 +363,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const applicationData = insertApplicationSchema.parse(req.body);
 
       // Check if opportunity exists and is open
-      const opportunity = await storage.getOpportunityById(applicationData.opportunityId);
+      const opportunity = await storage.getOpportunityById(
+        applicationData.opportunityId,
+      );
 
       if (!opportunity) {
         return res.status(404).json({ message: "Opportunity not found" });
       }
 
-      if (opportunity.status !== 'Open') {
-        return res.status(400).json({ message: "Cannot apply to a non-open opportunity" });
+      if (opportunity.status !== "Open") {
+        return res
+          .status(400)
+          .json({ message: "Cannot apply to a non-open opportunity" });
       }
 
       // Check if user has already applied
-      const existingApplications = await storage.getApplicationsByOpportunityId(applicationData.opportunityId);
-      const alreadyApplied = existingApplications.some(app => app.user.id === applicationData.userId);
+      const existingApplications = await storage.getApplicationsByOpportunityId(
+        applicationData.opportunityId,
+      );
+      const alreadyApplied = existingApplications.some(
+        (app) => app.user.id === applicationData.userId,
+      );
 
       if (alreadyApplied) {
-        return res.status(400).json({ message: "You have already applied to this opportunity" });
+        return res
+          .status(400)
+          .json({ message: "You have already applied to this opportunity" });
       }
 
       const newApplication = await storage.createApplication(applicationData);
       return res.status(201).json(newApplication);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid application data", errors: error.errors });
+        return res
+          .status(400)
+          .json({ message: "Invalid application data", errors: error.errors });
       }
       return res.status(500).json({ message: "Failed to create application" });
     }
   });
 
   // Accept an application
-  apiRouter.post("/applications/accept", async (req: Request, res: Response) => {
-    try {
-      const acceptData = insertSuccessfulApplicationSchema.parse(req.body);
+  apiRouter.post(
+    "/applications/accept",
+    async (req: Request, res: Response) => {
+      try {
+        const acceptData = insertSuccessfulApplicationSchema.parse(req.body);
 
-      // Check if opportunity exists
-      const opportunity = await storage.getOpportunityById(acceptData.opportunityId);
+        // Check if opportunity exists
+        const opportunity = await storage.getOpportunityById(
+          acceptData.opportunityId,
+        );
 
-      if (!opportunity) {
-        return res.status(404).json({ message: "Opportunity not found" });
+        if (!opportunity) {
+          return res.status(404).json({ message: "Opportunity not found" });
+        }
+
+        // Check if already accepted an application
+        const existingAccepted =
+          await storage.getSuccessfulApplicationByOpportunityId(
+            acceptData.opportunityId,
+          );
+
+        if (existingAccepted) {
+          return res.status(400).json({
+            message:
+              "An application has already been accepted for this opportunity",
+          });
+        }
+
+        const successfulApplication =
+          await storage.acceptApplication(acceptData);
+        return res.status(201).json(successfulApplication);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return res
+            .status(400)
+            .json({ message: "Invalid data", errors: error.errors });
+        }
+        return res
+          .status(500)
+          .json({ message: "Failed to accept application" });
       }
-
-      // Check if already accepted an application
-      const existingAccepted = await storage.getSuccessfulApplicationByOpportunityId(acceptData.opportunityId);
-
-      if (existingAccepted) {
-        return res.status(400).json({ message: "An application has already been accepted for this opportunity" });
-      }
-
-      const successfulApplication = await storage.acceptApplication(acceptData);
-      return res.status(201).json(successfulApplication);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid data", errors: error.errors });
-      }
-      return res.status(500).json({ message: "Failed to accept application" });
-    }
-  });
+    },
+  );
 
   // =====================
   // LEARNING AREAS ROUTES
