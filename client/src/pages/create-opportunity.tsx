@@ -101,6 +101,7 @@ export default function CreateOpportunity() {
       form.reset({
         ...opportunity,
         organisationId: opportunity.organisationId || user?.organisationId || 0,
+        hostDetails: opportunity.host_details || '',
         // Use empty array for learningAreaIds as we removed the UI for it
         learningAreaIds: [],
       });
