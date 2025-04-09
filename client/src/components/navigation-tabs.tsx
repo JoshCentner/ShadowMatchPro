@@ -11,8 +11,8 @@ interface NavigationTab {
 
 const tabs: NavigationTab[] = [
   { name: 'Home', shortName: 'Home', href: '/', icon: Home },
-  { name: 'Your Applications', shortName: 'Apps', href: '/applications', icon: FileText },
-  { name: 'Your Opportunities', shortName: 'Opps', href: '/your-opportunities', icon: Briefcase },
+  { name: 'Your Applications', shortName: 'My apps', href: '/applications', icon: FileText },
+  { name: 'Your Opportunities', shortName: 'My opps', href: '/your-opportunities', icon: Briefcase },
   { name: 'Profile', shortName: 'Profile', href: '/profile', icon: User },
 ];
 
