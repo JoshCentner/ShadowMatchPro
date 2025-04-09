@@ -18,10 +18,15 @@ export const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 // Check and create storage bucket for profile images if needed
 export async function checkStorageBuckets() {
   try {
+    log('Starting storage bucket check...', 'express');
+    
     if (!supabaseUrl || !supabaseKey) {
       log('Skipping storage bucket check - Supabase credentials missing', 'express');
       return;
     }
+
+    log(`Using Supabase URL: ${supabaseUrl}`, 'express');
+    log('Checking bucket permissions and existence...', 'express');
     
     // Directly try to get the bucket first (more reliable than listing in some cases)
     let { data: bucketData, error: getBucketError } = await supabase.storage.getBucket(AVATARS_BUCKET);

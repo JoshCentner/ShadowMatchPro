@@ -87,11 +87,21 @@ export const supabase = {
 // Helper function for uploading profile images
 export const uploadProfileImage = async (file: File, userId: number): Promise<string | null> => {
   try {
+    console.log('Starting profile image upload for user:', userId);
+    console.log('File details:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}-${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
     
+    console.log('Generated file path:', filePath);
+    
     const { data, error } = await supabase.storage.from('profile-images').upload(filePath, file);
+    console.log('Supabase upload response:', { data, error });
     
     if (error) {
       console.error('Error uploading image:', error);
@@ -122,6 +132,7 @@ export const uploadProfileImage = async (file: File, userId: number): Promise<st
     
     // Get the public URL
     const { data: urlData } = await supabase.storage.from('profile-images').getPublicUrl(filePath);
+    console.log('Generated public URL:', urlData);
     
     return urlData.publicUrl || null;
   } catch (error) {
