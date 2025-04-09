@@ -39,17 +39,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================
   // AUTH ROUTES
   // =====================
-  
+
   // Register user (simulate Google auth for MVP)
   apiRouter.post("/auth/register", async (req: Request, res: Response) => {
     try {
       const userData = insertUserSchema.parse(req.body);
       const existingUser = await storage.getUserByEmail(userData.email);
-      
+
       if (existingUser) {
         return res.status(200).json(existingUser);
       }
-      
+
       const newUser = await storage.createUser(userData);
       return res.status(201).json(newUser);
     } catch (error) {
@@ -64,40 +64,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/auth/google-signin", async (req: Request, res: Response) => {
     try {
       const { email, name, pictureUrl } = req.body;
-      
+
       if (!email || !name) {
         return res.status(400).json({ message: 'Email and name are required' });
       }
-      
+
       // Check if user already exists
       let user = await storage.getUserByEmail(email);
-      
+
       if (user) {
         // If user exists, update their profile if needed
         const needsUpdate = 
           (pictureUrl && user.pictureUrl !== pictureUrl) || 
           (user.name !== name);
-        
+
         if (needsUpdate) {
           const updateData: Partial<typeof user> = {};
-          
+
           if (pictureUrl && user.pictureUrl !== pictureUrl) {
             updateData.pictureUrl = pictureUrl;
           }
-          
+
           if (user.name !== name) {
             updateData.name = name;
           }
-          
+
           const updatedUser = await storage.updateUser(user.id, updateData);
           if (updatedUser) {
             user = updatedUser;
           }
         }
-        
+
         return res.json(user);
       }
-      
+
       // Create new user - organization will be set during first profile visit
       const userData = {
         email,
@@ -120,18 +120,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user
   apiRouter.get("/auth/me", async (req: Request, res: Response) => {
     const userId = req.query.userId as string;
-    
+
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    
+
     try {
       const user = await storage.getUserById(parseInt(userId));
-      
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       return res.status(200).json(user);
     } catch (error) {
       return res.status(500).json({ message: "Failed to get user" });
@@ -143,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = parseInt(req.params.id);
     console.log('API /users/:id PUT - Request body:', req.body);
     console.log('API /users/:id PUT - User ID:', userId);
-    
+
     try {
       const userData = {
         name: req.body.name,
@@ -153,11 +153,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       console.log('API /users/:id PUT - Validated data:', userData);
       const updatedUser = await storage.updateUser(userId, userData);
-      
+
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       return res.status(200).json(updatedUser);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================
   // ORGANISATION ROUTES
   // =====================
-  
+
   // Get all organisations
   apiRouter.get("/organisations", async (_req: Request, res: Response) => {
     try {
@@ -184,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================
   // OPPORTUNITY ROUTES
   // =====================
-  
+
   // Get all opportunities with optional filters
   apiRouter.get("/opportunities", async (req: Request, res: Response) => {
     try {
@@ -193,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: req.query.status as string | undefined,
         format: req.query.format as string | undefined
       };
-      
+
       const opportunities = await storage.getOpportunities(filters);
       return res.status(200).json(opportunities);
     } catch (error) {
@@ -203,18 +203,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get opportunity by ID
   apiRouter.get("/opportunities/:id", async (req: Request, res: Response) => {
-    try {
-      const opportunityId = parseInt(req.params.id);
-      const opportunity = await storage.getOpportunityById(opportunityId);
-      
-      if (!opportunity) {
-        return res.status(404).json({ message: "Opportunity not found" });
-      }
-      
-      return res.status(200).json(opportunity);
-    } catch (error) {
-      return res.status(500).json({ message: "Failed to get opportunity" });
+    const id = parseInt(req.params.id);
+    console.log('GET /api/opportunities/:id - Request:', { id });
+
+    const opportunity = await storage.getOpportunityById(id);
+    console.log('GET /api/opportunities/:id - DB Result:', opportunity);
+
+    if (!opportunity) {
+      console.log('GET /api/opportunities/:id - Not Found');
+      return res.status(404).json({ message: "Opportunity not found" });
     }
+
+    console.log('GET /api/opportunities/:id - Response:', {
+      id: opportunity.id,
+      title: opportunity.title,
+      organisation: opportunity.organisation,
+      learningAreas: opportunity.learningAreas,
+      applications: opportunity.applications?.length,
+      status: opportunity.status
+    });
+
+    res.json(opportunity);
   });
 
   // Create opportunity
@@ -222,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const opportunityData = insertOpportunitySchema.parse(req.body);
       const newOpportunity = await storage.createOpportunity(opportunityData);
-      
+
       // Add learning areas if provided
       if (req.body.learningAreaIds && Array.isArray(req.body.learningAreaIds)) {
         for (const areaId of req.body.learningAreaIds) {
@@ -232,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       return res.status(201).json(newOpportunity);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -254,13 +263,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         host_details: opportunityData.hostDetails,
         organisation_id: opportunityData.organisationId
       };
-      
+
       const updatedOpportunity = await storage.updateOpportunity(opportunityId, updateData);
-      
+
       if (!updatedOpportunity) {
         return res.status(404).json({ message: "Opportunity not found" });
       }
-      
+
       return res.status(200).json(updatedOpportunity);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -284,7 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================
   // APPLICATION ROUTES
   // =====================
-  
+
   // Get applications for an opportunity
   apiRouter.get("/opportunities/:id/applications", async (req: Request, res: Response) => {
     try {
@@ -311,26 +320,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/applications", async (req: Request, res: Response) => {
     try {
       const applicationData = insertApplicationSchema.parse(req.body);
-      
+
       // Check if opportunity exists and is open
       const opportunity = await storage.getOpportunityById(applicationData.opportunityId);
-      
+
       if (!opportunity) {
         return res.status(404).json({ message: "Opportunity not found" });
       }
-      
+
       if (opportunity.status !== 'Open') {
         return res.status(400).json({ message: "Cannot apply to a non-open opportunity" });
       }
-      
+
       // Check if user has already applied
       const existingApplications = await storage.getApplicationsByOpportunityId(applicationData.opportunityId);
       const alreadyApplied = existingApplications.some(app => app.user.id === applicationData.userId);
-      
+
       if (alreadyApplied) {
         return res.status(400).json({ message: "You have already applied to this opportunity" });
       }
-      
+
       const newApplication = await storage.createApplication(applicationData);
       return res.status(201).json(newApplication);
     } catch (error) {
@@ -345,21 +354,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/applications/accept", async (req: Request, res: Response) => {
     try {
       const acceptData = insertSuccessfulApplicationSchema.parse(req.body);
-      
+
       // Check if opportunity exists
       const opportunity = await storage.getOpportunityById(acceptData.opportunityId);
-      
+
       if (!opportunity) {
         return res.status(404).json({ message: "Opportunity not found" });
       }
-      
+
       // Check if already accepted an application
       const existingAccepted = await storage.getSuccessfulApplicationByOpportunityId(acceptData.opportunityId);
-      
+
       if (existingAccepted) {
         return res.status(400).json({ message: "An application has already been accepted for this opportunity" });
       }
-      
+
       const successfulApplication = await storage.acceptApplication(acceptData);
       return res.status(201).json(successfulApplication);
     } catch (error) {
@@ -373,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================
   // LEARNING AREAS ROUTES
   // =====================
-  
+
   // Get all learning areas
   apiRouter.get("/learning-areas", async (_req: Request, res: Response) => {
     try {

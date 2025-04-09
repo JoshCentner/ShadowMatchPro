@@ -20,6 +20,30 @@ export default function OpportunityDetail() {
   const { data: opportunity, isLoading, error } = useQuery<OpportunityWithDetails>({
     queryKey: [`/api/opportunities/${opportunityId}`],
     enabled: !!opportunityId,
+    onSuccess: (data) => {
+      console.log('Opportunity Details - Query Success:', {
+        opportunity: data,
+        learningAreas: data?.learningAreas,
+        organisation: data?.organisation,
+        applications: data?.applications,
+        hostDetails: data?.hostDetails,
+        createdByUserId: data?.createdByUserId
+      });
+    },
+    onError: (err) => {
+      console.error('Opportunity Details - Query Error:', err);
+    }
+  });
+
+  // Log component state changes
+  console.log('Opportunity Details - Component State:', {
+    isLoading,
+    hasError: !!error,
+    opportunityId,
+    isCreator,
+    hasApplied,
+    learningOutcomes,
+    currentUserId: user?.id
   });
 
   // Determine if the current user is the creator
