@@ -68,7 +68,7 @@ export default function CreateOpportunity() {
     queryKey: [`/api/opportunities/${opportunityId}`],
     enabled: !!opportunityId,
   });
-  
+
   console.log(opportunity);
 
   // Set up form with react-hook-form
@@ -100,7 +100,7 @@ export default function CreateOpportunity() {
       // Set form values
       form.reset({
         ...opportunity,
-        organisationId: opportunity.organisationId || user?.organisationId || 0,
+        organisationId: opportunity.organisation_id || opportunity.organisationId || 0,
         hostDetails: opportunity.host_details || '',
         // Use empty array for learningAreaIds as we removed the UI for it
         learningAreaIds: [],
