@@ -213,11 +213,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Opportunity not found" });
       }
       
-      console.log('GET /api/opportunities/:id - DB Result:', opportunity);
+      console.log('GET /api/opportunities/:id - Full DB Result:', JSON.stringify(opportunity, null, 2));
+      console.log('GET /api/opportunities/:id - Duration Value:', opportunity.durationLimit);
       console.log('GET /api/opportunities/:id - Response:', {
         id: opportunity.id,
         title: opportunity.title,
         organisation: opportunity.organisation,
+        durationLimit: opportunity.durationLimit,
         learningAreas: opportunity.learningAreas,
         applications: opportunity.applications,
         status: opportunity.status
