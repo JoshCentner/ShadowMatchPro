@@ -26,7 +26,8 @@ export default function OpportunityDetail() {
         duration: data?.duration_limit,
         durationLimit: data?.durationLimit,
         host: data?.host_details,
-        hostDetails: data?.hostDetails
+        hostDetails: data?.hostDetails,
+        applications: data?.applications
       });
     }
   });
