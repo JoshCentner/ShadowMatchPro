@@ -25,3 +25,27 @@
     @apply bg-[#007D8A]/10 text-[#007D8A];
   }
 }
+
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0; /* added to prevent default body margin */
+}
+
+
+/* Banner Styles */
+.banner {
+  @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white p-10 flex items-center justify-center;
+  min-height: 200px;
+}
+
+.banner-content {
+  @apply text-center text-3xl font-bold;
+}
+
+.banner-button {
+  @apply mt-4 bg-white text-blue-500 hover:bg-blue-100 px-6 py-3 rounded-md font-semibold;
+}

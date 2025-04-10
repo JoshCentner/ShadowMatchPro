@@ -62,6 +62,25 @@ export default function Home() {
 
       <NavigationTabs />
 
+      <div className="bg-gradient-to-r from-primary/90 to-primary text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+              Find Your Next Growth Opportunity
+            </h1>
+            <p className="mt-6 text-lg leading-8">
+              Connect with industry leaders, learn new skills, and advance your career through hands-on experience.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <button onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })} 
+                className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-primary shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                Browse Opportunities
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
