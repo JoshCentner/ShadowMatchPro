@@ -63,9 +63,9 @@ export default function Home() {
       <NavigationTabs />
 
       <div className="bg-gradient-to-r from-primary/90 to-primary text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Find Your Next Growth Opportunity
             </h1>
             <p className="mt-6 text-lg leading-8">
