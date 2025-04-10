@@ -9,5 +9,23 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    background: linear-gradient(
+      45deg,
+      hsl(280, 100%, 98%) 0%,
+      hsl(320, 100%, 98%) 25%,
+      hsl(20, 100%, 98%) 50%,
+      hsl(60, 100%, 98%) 75%,
+      hsl(280, 100%, 98%) 100%
+    );
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .button-primary {
+    background: linear-gradient(45deg, #ff61f4, #9d61ff);
   }
 }
