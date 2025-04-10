@@ -18,25 +18,25 @@ export default function Home() {
     format?: string;
     status?: string;
   }>({});
-  
+
   const [, navigate] = useLocation();
   const { user } = useAuth();
 
   // Construct the query string for filtered opportunities
   const buildQueryString = () => {
     const params = new URLSearchParams();
-    
+
     if (filters.organisationId) {
       params.append('organisationId', filters.organisationId.toString());
     }
-    
+
     if (filters.format) {
       params.append('format', filters.format);
     }
-    
+
     // Always filter for Open opportunities
     params.append('status', 'Open');
-    
+
     const queryString = params.toString();
     return queryString ? `?${queryString}` : '';
   };
@@ -61,7 +61,7 @@ export default function Home() {
       )}
 
       <NavigationTabs />
-      
+
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
@@ -81,7 +81,7 @@ export default function Home() {
                 </Collapsible>
               </div>
             </div>
-            
+
             {isLoading ? (
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {[...Array(6)].map((_, i) => (

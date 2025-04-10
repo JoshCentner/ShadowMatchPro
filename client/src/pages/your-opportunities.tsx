@@ -45,10 +45,10 @@ export default function YourOpportunities() {
   const handleStatusChange = async (opportunityId: number, status: 'Filled' | 'Closed') => {
     try {
       await apiRequest('PUT', `/api/opportunities/${opportunityId}`, { status });
-      
+
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: [`/api/users/${user?.id}/opportunities`] });
-      
+
       toast({
         title: 'Status updated',
         description: `Opportunity marked as ${status}`,
@@ -109,7 +109,7 @@ export default function YourOpportunities() {
 
       toast({
         title: "Applicant accepted",
-        description: `You've accepted ${application.user.name} for this shadowing opportunity.`,
+        description: `You've accepted ${application.user.name} for this opportunity.`,
       });
 
       setIsApplicationsModalOpen(false);
@@ -265,8 +265,7 @@ export default function YourOpportunities() {
               </CardHeader>
               <CardContent className="text-center py-6">
                 <p className="text-gray-500 mb-6">
-                  You haven't created any shadowing opportunities yet, but you
-                  could.
+                  You haven't created any opportunities yet, but you could.
                 </p>
               </CardContent>
             </Card>
@@ -297,7 +296,7 @@ export default function YourOpportunities() {
                 Applications for {selectedOpportunity.title}
               </DialogTitle>
               <DialogDescription>
-                Review and select an applicant for this shadowing opportunity.
+                Review and select an applicant for this opportunity.
               </DialogDescription>
             </DialogHeader>
             {console.log("Applications in dialog:", selectedOpportunity)}

@@ -34,7 +34,7 @@ export default function OpportunityDetail() {
 
   // Determine if the current user is the creator
   const isCreator = user && opportunity && user.id === opportunity.createdByUserId;
-  
+
   // Determine if the user has already applied
   console.log('Checking hasApplied:', {
     user: user?.id,
@@ -44,7 +44,7 @@ export default function OpportunityDetail() {
       user_id: app.user_id 
     }))
   });
-  
+
   const hasApplied = user && opportunity?.applications?.some(app => {
     const matches = app.userId === user.id || app.user_id === user.id;
     console.log('Application check:', {
@@ -58,14 +58,14 @@ export default function OpportunityDetail() {
   });
 
   console.log('Final hasApplied value:', hasApplied);
-  
+
   // Format the learning outcomes as an array
   const learningOutcomes = opportunity?.learningAreas.map(area => area.name) || [];
 
   return (
     <>
       <NavigationTabs />
-      
+
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
@@ -130,14 +130,14 @@ export default function OpportunityDetail() {
                   {opportunity.status}
                 </span>
               </div>
-              
+
               <div className="border-t border-gray-200">
                 <dl>
                   <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Format</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.format}</dd>
                   </div>
-                  
+
                   <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Duration</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.duration_limit}</dd>
@@ -147,12 +147,12 @@ export default function OpportunityDetail() {
                     <dt className="text-sm font-medium text-gray-500">Description</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.description}</dd>
                   </div>
-                  
+
                   <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Host Details</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{opportunity.host_details || 'No host details provided'}</dd>
                   </div>
-                  
+
                   {learningOutcomes.length > 0 && (
                     <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">You will learn</dt>
@@ -168,10 +168,10 @@ export default function OpportunityDetail() {
                       </dd>
                     </div>
                   )}
-                  
+
                   {opportunity.hostDetails && (
                     <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">You will shadow</dt>
+                      <dt className="text-sm font-medium text-gray-500">You will </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         <div className="flex items-center">
                           <div className={`flex-shrink-0 h-10 w-10 rounded-full ${getOrganisationColor(opportunity.organisation.shortCode)} flex items-center justify-center`}>
@@ -186,7 +186,7 @@ export default function OpportunityDetail() {
                   )}
                 </dl>
               </div>
-              
+
               <div className="px-4 py-5 sm:px-6">
                 {isCreator ? (
                   <Button variant="outline" className="w-full" asChild>
@@ -215,7 +215,7 @@ export default function OpportunityDetail() {
           ) : null}
         </div>
       </main>
-      
+
       {opportunity && (
         <ApplicationModal 
           isOpen={isApplicationModalOpen} 

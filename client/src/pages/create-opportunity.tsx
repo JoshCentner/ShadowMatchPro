@@ -146,7 +146,7 @@ export default function CreateOpportunity() {
         toast({
           title: "Opportunity updated",
           description:
-            "The shadowing opportunity has been updated successfully",
+            "The opportunity has been updated successfully",
         });
       } else {
         // Create new opportunity
@@ -158,7 +158,7 @@ export default function CreateOpportunity() {
         toast({
           title: "Opportunity created",
           description:
-            "Your shadowing opportunity has been created successfully",
+            "Your opportunity has been created successfully",
         });
       }
 
@@ -202,12 +202,11 @@ export default function CreateOpportunity() {
             <CardHeader>
               <CardTitle>
                 {isEditing
-                  ? "Edit Shadowing Opportunity"
-                  : "Create New Shadowing Opportunity"}
+                  ? "Edit Opportunity"
+                  : "Create New Opportunity"}
               </CardTitle>
               <CardDescription>
-                Provide details about the shadowing opportunity you'd like to
-                offer.
+                Provide details about the opportunity you'd like to offer.
               </CardDescription>
             </CardHeader>
 

@@ -80,7 +80,7 @@ export default function ApplicationModal({
         <DialogHeader>
           <DialogTitle>Apply for Shadowing</DialogTitle>
           <DialogDescription>
-            Tell us what you hope to get out of this shadowing opportunity. This will be visible to the opportunity creator.
+            Tell us what you hope to get out of this opportunity. This will be visible to the opportunity creator.
           </DialogDescription>
         </DialogHeader>
         
