@@ -115,7 +115,7 @@ export default function Auth() {
               <span className="w-full border-t"></span>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or select a demo organization</span>
+              <span className="px-2 bg-white text-gray-500">Or continue with SEEK</span>
             </div>
           </div>
 
@@ -126,48 +126,6 @@ export default function Auth() {
               disabled={isLoading || isManualLoading}
             >
               SEEK
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={() => handleDemoLogin(2)}
-              disabled={isLoading || isManualLoading}
-            >
-              REA
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={() => handleDemoLogin(3)}
-              disabled={isLoading || isManualLoading}
-            >
-              CarSales
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={() => handleDemoLogin(4)}
-              disabled={isLoading || isManualLoading}
-            >
-              Xero
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={() => handleDemoLogin(5)}
-              disabled={isLoading || isManualLoading}
-            >
-              Culture Amp
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={() => handleDemoLogin(6)}
-              disabled={isLoading || isManualLoading}
-            >
-              MYOB
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={() => handleDemoLogin(7)}
-              disabled={isLoading || isManualLoading}
-            >
-              Australia Post
             </Button>
           </div>
         </CardContent>
