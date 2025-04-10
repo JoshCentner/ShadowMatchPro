@@ -22,8 +22,9 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
     : Monitor;
 
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
-      <div className="px-4 py-5 sm:p-6">
+    <Link href={`/opportunities/${opportunity.id}`}>
+      <div className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+        <div className="px-4 py-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             {opportunity.organisation.logo_url ? (
@@ -56,22 +57,20 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
             <FormatIcon className="h-5 w-5 mr-1.5 text-gray-400" />
             {opportunity.format}
           </span>
-          <Link href={`/opportunities/${opportunity.id}`}>
-            <a 
-              className={`inline-flex items-center text-sm font-medium ${
-                opportunity.status === 'Filled' 
-                  ? 'text-gray-400 cursor-not-allowed' 
-                  : 'text-primary hover:text-blue-600'
-              }`}
-            >
-              View Details
-              <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          </Link>
+          <span 
+            className={`inline-flex items-center text-sm font-medium ${
+              opportunity.status === 'Filled' 
+                ? 'text-gray-400 cursor-not-allowed' 
+                : 'text-primary hover:text-blue-600'
+            }`}
+          >
+            View Details
+            <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
