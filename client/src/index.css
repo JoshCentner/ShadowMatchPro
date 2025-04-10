@@ -22,6 +22,6 @@
   }
 
   .status-filled {
-    @apply bg-[#007D8A]/10 text-[#007D8A];
+    @apply bg-[#E91E63]/10 text-[#E91E63];
   }
 }
