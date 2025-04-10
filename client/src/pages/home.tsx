@@ -65,7 +65,7 @@ export default function Home() {
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <div className="sticky top-0 z-10 pt-1 pb-4">
+            <div className="pt-1 pb-4">
               <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold text-primary font-['Caveat'] text-2xl">See how work gets done.</h1>
                 <Collapsible>
