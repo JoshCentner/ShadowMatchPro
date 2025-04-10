@@ -49,12 +49,19 @@ export default function AuthCallback() {
         
         // Get the return URL from query params
         const params = new URLSearchParams(window.location.search);
-        const returnTo = params.get('returnTo') || '/';
+        let returnTo = params.get('returnTo') || '/';
+
+        // Determine if we're in production
+        const isProd = window.location.hostname === 'shadow-match.replit.app';
+        const baseUrl = isProd 
+          ? 'https://shadow-match.replit.app'
+          : 'https://193367b7-3aad-4ebe-895a-1fed206b006e-00-1o62s6w07wi0n.janeway.replit.dev';
         
-        // If returnTo is from a different origin, default to home
+        // If returnTo is a full URL, validate it
         try {
           const returnToUrl = new URL(returnTo);
-          if (returnToUrl.origin === window.location.origin) {
+          // Only allow redirects to our domains
+          if (returnToUrl.origin === baseUrl) {
             setLocation(returnToUrl.pathname + returnToUrl.search);
           } else {
             setLocation('/');
