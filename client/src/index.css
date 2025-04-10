@@ -4,10 +4,22 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-[#EAEAEA];
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-[#FAFAFA] text-[#222222];
+  }
+
+  .status-open {
+    @apply bg-[#2ECC71]/10 text-[#2ECC71];
+  }
+
+  .status-closed {
+    @apply bg-[#666666]/10 text-[#666666];
+  }
+
+  .status-filled {
+    @apply bg-[#007D8A]/10 text-[#007D8A];
   }
 }
